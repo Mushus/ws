@@ -1,0 +1,6 @@
+[submodule "boilerplates"]
+	path = boilerplates
+	url = git@github.com:Mushus/boilerplates.git
+[submodule "til"]
+	path = til
+	url = git@github.com:Mushus/til.git
