@@ -4,3 +4,6 @@
 [submodule "til"]
 	path = til
 	url = git@github.com:Mushus/til.git
+[submodule "toolbox"]
+	path = toolbox
+	url = https://github.com/Mushus/toolbox
