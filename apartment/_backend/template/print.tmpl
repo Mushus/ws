@@ -1,0 +1,287 @@
+{{- define "title" -}} 管理画面 {{- end -}}
+
+{{- define "head" -}}
+<style>
+  @media screen {
+    .print-field {
+      padding: 5px;
+      background-color: #eee;
+    }
+    .print-field.size-b5 .print-sheet {
+      margin-left: auto;
+      margin-right: auto;
+      width: 182mm;
+      height: 257mm;
+    }
+    .print-field.size-a4 .print-sheet {
+      margin-left: auto;
+      margin-right: auto;
+      width: 210mm;
+      height: 297mm;
+    }
+    .print-sheet {
+      box-sizing: border-box;
+      background: #fff;
+      box-shadow: 0 .5mm 2mm rgba(0,0,0,.3);
+      margin: 5mm;
+    }
+  }
+
+  @page {
+    margin: 0;
+  }
+  @media print {
+    .print-sheet {
+      page-break-after: always;
+    }
+    .print-menu {
+      display: none;
+      visibility: hidden;
+    }
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  .bill {
+    padding: 10mm;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    align-items: baseline;
+    font-size: 4mm;
+    line-height: 6mm;
+  }
+  .bill * {
+    font-weight: normal;
+  }
+
+  .bill .bill-title {
+    width: 50%;
+    font-size: 6mm;
+    line-height: 9mm;
+  }
+  .bill .bill-record {
+    width: 50%;
+    display: flex;
+  }
+  .bill .bill-created-at {
+    width: 40mm;
+  }
+  .bill .bill-no {
+    width: 40mm;
+  }
+  .bill .bill-no-text {
+    display: inline-block;
+    line-height: 4mm;
+    width:100%;
+    border-bottom: 1px solid #888;
+  }
+
+  .bill .bill-billing-term {
+    width: 100%;
+    height: 10mm;
+  }
+  .bill .bill-request-to {
+    width: 50%;
+    height: 20mm;
+  }
+  .bill .bill-requested {
+    font-size: 6mm;
+    line-height: 9mm;
+  }
+
+  .bill .bill-request-from {
+    width: 50%;
+  }
+  .bill .bill-requester {
+    font-size: 5mm;
+    line-height: 9mm;
+  }
+
+  .bill .bill-detail {
+    width: 100%;
+    border: 1px solid #888;
+    border-collapse: collapse;
+    margin-bottom: 10mm;
+  }
+  .bill .bill-detail td, .bill .bill-detail th {
+    padding: 1mm;
+    border: 1px solid #ccc;
+  }
+
+  .bill .bill-detail td:nth-child(4) {
+    text-align: right;
+  }
+  .bill .bill-detail-sum {
+    border-top: 2px solid #ccc
+  }
+  .bill .bill-date {
+    width: 45%;
+  }
+  .bill .bill-date-text {
+    display: inline-block;
+    text-align: right;
+    line-height: 4mm;
+    width:100%;
+    border-bottom: 1px solid #888;
+  }
+  .bill .bill-payment {
+    width: 45%;
+  }
+  .bill .bill-payment-text {
+    display: inline-block;
+    text-align: left;
+    line-height: 4mm;
+    width: 80%;
+    border-bottom: 1px solid #888;
+  }
+
+</style>
+{{ end -}}
+
+{{- define "body" -}}
+<div class="print-menu">
+  <select class="paper-size" onchange="changeSize(this)">
+    <option value="b5" selected>B5</option>
+    <option value="a4">A4</option>
+  </select>
+  <button type="button" onclick="print();">印刷する</button>
+</div>
+<div id="print-field" class="print-field size-b5">
+  <article class="print-sheet bill">
+    <h1 class="bill-title">請求書</h1>
+    <div class="bill-record">
+      <div class="bill-created-at">2018 年 7 月 1 日</div>
+      <div class="bill-no"><div class="bill-no-text">No.</div></div>
+    </div>
+    <div class="bill-billing-term">2018 年 7 月度分</div>
+    <div class="bill-request-to">
+      <div class="bill-billing-destination">本マ1-F 号室</div>
+      <div class="bill-requested">[名前] 様</div>
+    </div>
+    <div class="bill-request-from">
+      <div class="bill-requester-address"> [住所]</div>
+      <div class="bill-requester">[名前]</div>
+    </div>
+    <table class="bill-detail">
+      <thead>
+        <tr>
+          <th style="width: calc(100% / 3);">品名</th>
+          <th style="width: calc(100% / 6);">数量</th>
+          <th style="width: calc(100% / 6);">単価</th>
+          <th style="width: calc(100% / 3);">金額(税込み)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>家賃</td>
+          <td></td>
+          <td></td>
+          <td>¥28,600</td>
+        </tr>
+        <tr>
+          <td>駐車場</td>
+          <td></td>
+          <td></td>
+          <td>¥0</td>
+        </tr>
+        <tr>
+          <td>上下水道料</td>
+          <td>19</td>
+          <td>350</td>
+          <td>¥6,650</td>
+        </tr>
+        <tr>
+          <td>合計</td>
+          <td></td>
+          <td></td>
+          <td>¥35,250</td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+  <article class="print-sheet bill">
+    <h1 class="bill-title">家賃明細</h1>
+    <div class="bill-record">
+      <div class="bill-created-at">2018 年 7 月 1 日</div>
+      <div class="bill-no"><div class="bill-no-text">No.</div></div>
+    </div>
+    <div class="bill-billing-term">2018 年 7 月度分</div>
+    <div class="bill-request-to">
+      <div class="bill-billing-destination">本マ1-F 号室</div>
+      <div class="bill-requested">[名前] 様</div>
+    </div>
+    <div class="bill-request-from">
+      <div class="bill-requester-address">[住所]</div>
+      <div class="bill-requester">[名前]</div>
+    </div>
+    <table class="bill-detail">
+      <thead>
+        <tr>
+          <th style="width: calc(100% / 3);">品名</th>
+          <th style="width: calc(100% / 6);">数量</th>
+          <th style="width: calc(100% / 6);">単価</th>
+          <th style="width: calc(100% / 3);">金額(税込み)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>家賃</td>
+          <td></td>
+          <td></td>
+          <td>¥28,600</td>
+        </tr>
+        <tr>
+          <td>駐車場</td>
+          <td></td>
+          <td></td>
+          <td>¥0</td>
+        </tr>
+        <tr>
+          <td>上下水道料</td>
+          <td>19</td>
+          <td>350</td>
+          <td>¥6,650</td>
+        </tr>
+        <tr class="bill-detail-sum">
+          <td>合計</td>
+          <td></td>
+          <td></td>
+          <td>¥35,250</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="bill-date"><div class="bill-date-text">年　　　　　月　　　　　日</div></div>
+    <div class="bill-payment"><div class="bill-payment-text">¥</div> 印</div>
+  </article>
+</div>
+{{ end -}}
+
+{{- define "footerScript" -}}
+<script>
+function changeSize(elem) {
+  const size = elem.value;
+  document.querySelector('#print-field').className = "print-field size-" + size;
+  cssPagedMedia.size(size);
+}
+
+// メディアサイズを変更する
+const cssPagedMedia = (function cssPagedMedia() {
+    var style = document.createElement('style');
+    document.head.appendChild(style);
+    return function (rule) {
+        style.innerHTML = rule;
+    };
+})();
+
+cssPagedMedia.size = function (size) {
+    cssPagedMedia('@page {size: ' + size + '}');
+};
+
+changeSize(document.querySelector('.paper-size'));
+</script>
+{{ end -}}

@@ -1,0 +1,88 @@
+{
+  "articles": [
+    {
+      "id": "1",
+      "name": "hogeマンション",
+      "rooms": [
+        {
+          "id": "1",
+          "name": "101号室",
+          "rent": 10000,
+          "index": 0,
+          "tenant": {
+            "id": 2,
+            "name": "佐藤花子",
+            "rent": 100,
+            "issueFlag": true
+          }
+        },
+        {
+          "id": "2",
+          "name": "201号室",
+          "rent": 30000,
+          "index": 1,
+          "tenant": {
+            "id": 2,
+            "name": "佐藤花子",
+            "rent": 100,
+            "issueFlag": false
+          }
+        },
+        {
+          "id": "3",
+          "name": "202号室",
+          "rent": 20000,
+          "index": 2,
+          "tenant": {
+            "id": 2,
+            "name": "佐藤花子",
+            "rent": 100,
+            "issueFlag": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "hogeマンション",
+      "rooms": [
+        {
+          "id": "1",
+          "name": "101号室",
+          "rent": 10000,
+          "index": 0,
+          "tenant": {
+            "id": 2,
+            "name": "佐藤花子",
+            "rent": 100,
+            "issueFlag": true
+          }
+        },
+        {
+          "id": "2",
+          "name": "201号室",
+          "rent": 30000,
+          "index": 1,
+          "tenant": {
+            "id": 2,
+            "name": "佐藤花子",
+            "rent": 100,
+            "issueFlag": true
+          }
+        },
+        {
+          "id": "3",
+          "name": "202号室",
+          "rent": 20000,
+          "index": 2,
+          "tenant": {
+            "id": 2,
+            "name": "佐藤花子",
+            "rent": 100,
+            "issueFlag": true
+          }
+        }
+      ]
+    }
+  ]
+}
