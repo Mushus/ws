@@ -1,0 +1,23 @@
+# CRUDの口を用意する
+endpoint:
+  - top
+  - work
+
+# サービス一覧
+services:
+  datastore:
+    mysql_v1:
+      host: localhost
+      port: 3306
+      user: tlab-app
+      passowrd: team-lab
+  cache:
+    redis_v1:
+      host: localhost
+      port: 6379
+      database: 0
+
+# 外部接続許可(CROSS ORIGIN)
+cors:
+  - localhost
+  - "127.0.0.1"

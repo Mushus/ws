@@ -1,0 +1,47 @@
+CREATE TABLE IF NOT EXISTS `image` (
+    `id` VARCHAR(32) NOT NULL PRIMARY KEY,
+    `storage_key` VARCHAR(1024) NOT NULL PRIMARY KEY
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `photo` (
+    `id` VARCHAR(32) NOT NULL PRIMARY KEY,
+    `image_id` VARCHAR(32) NOT NULL,
+    `alt` VARCHAR(500) NOT NULL
+    `top_top_photo_id` VARCHAR(32),
+    `top_sentence_sentence_id` VARCHAR(32),
+    FOREIGN KEY (top_top_photo_id) REFERENCES top (id) ON UPDATE CASCADE ON DELETE CASCADE
+    # 命名規則どうするのか問題あるけど一旦これで
+    FOREIGN KEY (top_sentence_sentence_id) REFERENCES top (id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `address` (
+    `id` VARCHAR(32) NOT NULL PRIMARY KEY,
+    `prefecture` MEDIUMTEXT,
+    `ward` MEDIUMTEXT,
+    `town` MEDIUMTEXT,
+    `village` MEDIUMTEXT,
+    `top_id` VARCHAR(32),
+    FOREIGN KEY (top_id) REFERENCES top (id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `paragraph` (
+    `id` VARCHAR(32) NOT NULL PRIMARY KEY,
+    `text` MEDIUMTEXT,
+    `top_sentence_id` VARCHAR(32),
+    FOREIGN KEY (top_sentence_id) REFERENCES top (id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `top` (
+    `id` VARCHAR(32) NOT NULL PRIMARY KEY,
+    `publish_at` TIMESTAMP NOT NULL,
+    `expire_at` TIMESTAMP NOT NULL,
+    `title` VARCHAR(100) NOT NULL,
+    `description` VARCHAR(1000) NOT NULL,
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `top_sentence` (
+    `id` VARCHAR(32) NOT NULL PRIMARY KEY,
+    `top_id` VARCHAR(32),
+    `index` INTEGER NOT NULL,
+    FOREIGN KEY (top_id) REFERENCES top (id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;

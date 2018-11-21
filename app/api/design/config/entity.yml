@@ -1,0 +1,95 @@
+# 記事やマスタデータ等がどんなデータを持っているかを記述する
+types:
+  # 画像
+  photo:
+    args:
+      # ID
+      image:
+        # 画像
+        type: image
+      # altタグ
+      alt:
+        type: text
+        validation:
+          max_length: 500
+  # 文章
+  paragraph:
+    args:
+      text:
+        type: text
+  # 記事
+  article:
+    args:
+      # 公開開始日
+      publish_at:
+        # 日付型
+        type: date
+      # 公開終了日
+      expire_at:
+        type: date
+models:
+  # トップページ
+  top:
+    # article の属性を追加する
+    trait: article
+    # 検索するとき等に表示する値
+    # ユニークな必要はないが、ユニークであったほうがいい
+    label: title
+    args:
+      # タイトル
+      title:
+        # テキスト
+        type: text
+        validation:
+          min_length: 1
+          max_length: 100
+      # 説明
+      description:
+        # 文章
+        type: sentence
+        validation:
+          min_length: 1
+          max_length: 1000
+      # トップ画像
+      top_photo:
+        type: photo
+      sentence:
+        # ダイナミックの代わり
+        type: variable_list
+        items:
+          photo:
+            type: photo
+          paragrah:
+            type: paragraph
+      header:
+        # どれかの値になる
+        type: variable
+        items:
+          photo:
+            type: photo
+          paragrah:
+            type: paragraph
+      main:
+        # 複数個設定できる
+        type: list
+        items:
+          type: photo
+      link:
+        type: related_list
+        items: work
+        # TODO: フィルタしたくなる？
+  work:
+    model:
+    trait: article
+    label: title
+    args:
+      title:
+        type: text
+        validation:
+          min_length: 1
+          max_length: 100
+      description:
+        type: sentence
+        validation:
+          min_length: 1
+          max_length: 1000

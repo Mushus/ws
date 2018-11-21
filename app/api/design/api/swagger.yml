@@ -1,0 +1,226 @@
+openapi: "3.0.0"
+info:
+  title: CMS-API
+  description: CMS-API
+  version: 0.0.0
+paths:
+  /top/list:
+    get:
+      tags:
+        - TOP
+      description: TOPの一覧を取得します
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopContentList"
+  /top/search:
+    get:
+      tags:
+        - TOP
+      description: TOPを検索します
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: ページ番号
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: 最大件数
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: 検索クエリ
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopContentSearchlist"
+  /top:
+    post:
+      tags:
+        - TOP
+      description: TOPを新規追加します
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopContent"
+  /top/{id}:
+    get:
+      tags:
+        - TOP
+      description: TOPを取得します
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopContent"
+    put:
+      tags:
+        - TOP
+      description: TOPを更新します
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopContent"
+    delete:
+      tags:
+        - TOP
+      description: TOPを削除します
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopContentDelete"
+  /graphql:
+    post:
+      tags:
+        - GraphQL
+      description: >
+        GraphQLを使用しています。詳細はCLIツールを使用して自動生成してください。
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphQL"
+components:
+  schemas:
+    TopContentList:
+      type: object
+      description: Top一覧
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopContent"
+    TopContentSearchlist:
+      type: object
+      description: Top検索
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopContent"
+    TopContent:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - top_photo
+        - sentence
+        - header
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        top_photo:
+          $ref: "#/components/schemas/PhotoType"
+        sentence:
+          type: array
+          items:
+            oneOf:
+              - type: object
+                required:
+                  - photo
+                properties:
+                  photo:
+                    $ref: "#/components/schemas/PhotoType"
+              - type: object
+                required:
+                  - paragraph
+                properties:
+                  paragraph:
+                    $ref: "#/components/schemas/ParagraphType"
+        header:
+          oneOf:
+            - type: object
+              required:
+                - photo
+              properties:
+                photo:
+                  $ref: "#/components/schemas/PhotoType"
+            - type: object
+              required:
+                - paragraph
+              properties:
+                paragraph:
+                  $ref: "#/components/schemas/ParagraphType"
+          example:
+            photo:
+              image: string
+              alt: string
+        main:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhotoType"
+        link:
+          type: array
+          items:
+            type: string
+
+    PhotoType:
+      type: object
+      required:
+        - image
+        - alt
+      properties:
+        image:
+          type: string
+        alt:
+          type: string
+    ParagraphType:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+    TopContentDelete:
+      type: object
+    GraphQL:
+      type: object

@@ -1,0 +1,24 @@
+{
+  "name": "components",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "css-loader": "^1.0.0",
+    "html-beautify-webpack-plugin": "^1.0.5",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^4.0.0-beta.1",
+    "node-sass": "^4.9.3",
+    "prettier": "^1.14.3",
+    "prettier-webpack-plugin": "^1.1.0",
+    "sass-loader": "^7.1.0",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9",
+    "webpack-merge": "^4.1.4"
+  },
+  "scripts": {
+    "dev": "webpack-dev-server --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
+  }
+}

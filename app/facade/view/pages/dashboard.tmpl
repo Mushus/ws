@@ -1,0 +1,11 @@
+
+{{define "content"}}
+<p>hello</p>
+
+{{- /* コメント*/ -}}
+
+{{range .Dashboard}}<div>
+  <h2>{{.Title}}</h2>
+  {{.Tag}}
+</div>{{end}}
+{{end}}

@@ -1,0 +1,22 @@
+{{define "body"}}
+<header>
+<h1>APP</h1>
+</header>
+
+{{with .Nav}}<nav>
+  <ul>
+    {{range .}}<li>{{.Title}}
+      <ul>
+        {{range .Submenu}}<li><a href="{{.Link}}">{{.Text}}</a></li>{{end}}
+      </ul>
+    </li>{{end}}
+  </ul>
+</nav>{{end}}
+
+<main>
+{{block  "content" .Main}}{{end}}
+</main>
+
+<footer>
+</footer>
+{{end}}

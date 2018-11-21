@@ -1,0 +1,217 @@
+openapi: "3.0.0"
+info:
+  title: Plugin Standard API
+  description: 汎用管理画面対応の最小構成のAPI
+  version: 0.0.1
+paths:
+  /.server/app-settings:
+    get:
+      tags:
+        - 共通のエンドポイント[REQUIRED]
+      description: >
+        <p>
+        アプリケーションに共通する情報を取得するためのAPIです。
+        このエンドポイントは初回接続時にキャッシュされ使い回されます。
+        </p>
+        <p>
+        NOTE: キャッシュの制御については一旦未実装です。必要でしたら開発者までお問い合わせください。
+        </p>
+      parameters:
+        - $ref: "#/components/parameters/X-App-Endpoint"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+  /.server/user-info:
+    get:
+      tags:
+        - 共通のエンドポイント[REQUIRED]
+      description: >
+        <p>
+        ユーザーに紐づくアプリケーションの情報を返します。
+        </p>
+        <p>
+        NOTE: キャッシュについては未実装です。必要でしたら開発者までお問い合わせください。
+        </p>
+      parameters:
+        - $ref: "#/components/parameters/X-App-Endpoint"
+        - $ref: "#/components/parameters/Accept-Language"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+  /.server/healthcheck:
+    get:
+      tags:
+        - 任意に実装するエンドポイント[SHOULD]
+      description: >
+        ヘルスチェックの結果を返すエンドポイントです。
+      responses:
+        '200':
+          description: OK
+  /any-app-view:
+    get:
+      tags:
+        - 自由に定義するエンドポイント
+      description: >
+        スタンダードなAPIの定義方法が記載されたパスです。
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/X-App-Endpoint"
+        - $ref: "#/components/parameters/Accept-Language"
+      responses:
+        '200':
+          description: OK
+  /any-api:
+    get:
+      tags:
+        - 自由に定義するエンドポイント
+      description: >
+        スタンダードなAPIの定義方法が記載されたパスです。
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/X-App-Endpoint"
+        - $ref: "#/components/parameters/Accept-Language"
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    X-App-Endpoint:
+      in: header
+      name: X-App-Endpoint
+      schema:
+        type: string
+      required: true
+      description: >
+        エンドユーザーに配信されるときのアプリケーションのエンドポイントです。<br>
+        レスポンス時にエンドユーザー側から参照できるURLです。
+      example: http://backend-app.example.com/plugin
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      schema:
+        type: string
+      required: true
+      description: >
+        アプリケーション利用者の言語です。
+
+        * 多言語化するときはこちらを使用して実装します[MAY]
+    X-Authenticated-User:
+      in: header
+      name: X-Authenticated-User
+      schema:
+        type: string
+        format: uuid
+      required:
+      description: >
+        ログインしているユーザーの識別子です。
+  schemas:
+    AppSettings:
+      type: object
+      description: >
+        アプリケーションの共通の設定です。
+      required:
+        - widget
+        - healthcheck
+      properties:
+        widget:
+          type: object
+          description: >
+            ウィジェット一覧を取得するためのエンドポイントです。
+          properties:
+            dashboard:
+              type: object
+              description: >
+                ダッシュボードに表示するウィジェットを表します。
+              properties:
+                html:
+                  type: string
+                  description: >
+                    <p>
+                    ダッシュボードに表示するウィジェットのHTMLの部品情報のエンドポイントを返します。
+                    指定できる値の形式は絶対パスもしくはURLです。
+                    </p>
+                    <p>
+                    省略した場合はリクエストを行わず、代わりに以下のHTMLが挿入されます。
+                    <pre>
+                      &lt;div id="widget-[plugin-key]"&gt;&lt;/div&gt;
+                    </pre>
+                    </p>
+                  example: /dashboard/html
+                js:
+                  type: string
+                  description: >
+                    <p>
+                    ダッシュボードに読み込まれるjsを返します。バンドルされたjsを読み込む想定です。
+                    指定できる値の形式は絶対パスもしくはURLです。
+                    </p>
+                    <p>
+                    TODO: バンドルされたjsで良いのか確認
+                    </p>
+                  example: /dashboard/js
+        healthcheck:
+          type: string
+          description: >
+            アプリのヘルスチェックを行うエンドポイントです。
+            指定できる値の形式は絶対パスもしくはURLです。
+          nullable: true
+          example: /healthcheck
+    UserInfo:
+      type: object
+      description: >
+        ユーザーに紐づくアプリケーションの情報です。
+      properties:
+        notification:
+          type: string
+          description: >
+            ユーザーに通知したい情報です。ダッシュボード等で表示されます。
+            形式はHTMLが利用可能です。
+          nullable: true
+          example: 現在、このアプリケーションは使用できません。<br>詳細は管理者にお問い合わせください。
+        sidenav:
+          type: object
+          description: >
+            サイドナビゲーションに表示するリンクを取得します。
+          properties:
+            label:
+              type: string
+              description: >
+                サイドナビゲーションの文言です
+
+                * 多言語化に対応したほうがいいです[MAY]
+              example: コンテンツの管理
+            items:
+              $ref: "#/components/schemas/SidenavLink"
+    SidenavLink:
+      type: object
+      description: >
+        サイドナビゲーションのリンクです。
+      properties:
+        label:
+          type: string
+          description: >
+            リンクの文字です
+
+            * 多言語化に対応したほうがいいです[MAY]
+          example: 記事の管理
+        path:
+          type: string
+          description: >
+            リンク先です。
+            形式は絶対パスです。
+          example: /content/article
+

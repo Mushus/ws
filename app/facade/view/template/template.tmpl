@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{{.Head.Title}} | App</title>
+
+  {{- /* スクリプトの書き出し */}}
+  {{range .Head.Scripts}}<script src="{{.Src}}" {{.Attr}}></script>{{end}}
+
+  {{- /* ウィジェットの読み込みスクリプト */}}
+  {{with .Head.WidgetScripts}}<script type="module">
+    {{range $i, $v := .}}import widget{{$i}} from '{{$v.Src}}';{{end}}
+    {{range $i, $v := .}}window.customElements.define('{{$v.TagName}}', widget{{$i}});{{end}}
+  </script>{{end}}
+</head>
+<body>{{template "body" .Body}}</body>
+</html>
