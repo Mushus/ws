@@ -20,6 +20,9 @@
 		},
 		{
 			"path": "apartment"
+		},
+		{
+			"path": "tw"
 		}
 	],
 	"settings": {}
