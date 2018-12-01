@@ -57,6 +57,7 @@ module.exports = {
   css: ["~/assets/css/main.css"],
   build: {},
   modules: [
+    '@nuxtjs/dotenv',
     "@nuxtjs/axios",
     "~/modules/typescript.js"
   ],
