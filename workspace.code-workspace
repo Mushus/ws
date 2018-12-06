@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "tw"
+		},
+		{
+			"path": "lmd"
 		}
 	],
 	"settings": {}

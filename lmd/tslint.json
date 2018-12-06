@@ -1,0 +1,16 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint-config-standard",
+    "tslint-react",
+    "tslint-config-prettier"
+  ],
+  "jsRules": {},
+  "rules": {
+    "prettier": true,
+    "jsx-no-lambda": false
+  },
+  "rulesDirectory": [
+    "tslint-plugin-prettier"
+  ]
+}
