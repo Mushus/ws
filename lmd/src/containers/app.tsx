@@ -1,15 +1,16 @@
-import styled from "styled-components"
-import Input from "@/containers/todo/input"
-import List from "@/containers/todo/list"
+import styled from 'styled-components';
+import Input from '@/containers/main/input';
+import Editor from '@/containers/main/editor';
+import Result from '@/containers/main/result';
 
-import * as React from "react"
+import * as React from 'react';
 
 const PaneBox = styled.div`
 	display: flex;
-`
+`;
 const Panel = styled.div`
 	flex: 1;
-`
+`;
 
 export default () => (
 	<PaneBox>
@@ -17,8 +18,10 @@ export default () => (
 			<Input />
 		</Panel>
 		<Panel>
-			<List />
+			<Editor />
 		</Panel>
-		<Panel />
+		<Panel>
+			<Result />
+		</Panel>
 	</PaneBox>
-)
+);

@@ -1,42 +1,48 @@
-import actionCreatorFactory from "typescript-fsa"
-import { reducerWithInitialState } from "typescript-fsa-reducers"
+import actionCreatorFactory from 'typescript-fsa';
+import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 export interface IState {
-	text: string
-	inProgress: string[]
-	finished: string[]
+	lambda: string;
+	text: string;
+	result: any;
 }
 
 const initalState: IState = {
-	finished: [],
-	inProgress: [],
-	text: "",
+	lambda: '(v) => v',
+	text: '',
+	result: '',
+};
+
+const actionCreator = actionCreatorFactory();
+
+export const InputLambda = actionCreator<string>('INPUT_LAMBDA');
+export const InputAction = actionCreator<string>('Input');
+export const AddAction = actionCreator<void>('ADD');
+export const FinishAction = actionCreator<number>('FINISH');
+
+/**
+ * 計算する
+ * @param result 以前の結果
+ * @param lambda 計算式
+ */
+function calcResult(result: any, lambda: string, input: any): any {
+	try {
+		return eval(`${lambda}`)(input);
+	} catch (e) {}
+	return result;
 }
 
-const actionCreator = actionCreatorFactory()
-
-export const InputAction = actionCreator<string>("Input")
-export const AddAction = actionCreator<void>("ADD")
-export const FinishAction = actionCreator<number>("FINISH")
-
 export const reducer = reducerWithInitialState<IState>(initalState)
+	.case(InputLambda, (state, lambda) => {
+		return {
+			...state,
+			lambda,
+			result: calcResult(state.result, lambda, state.text),
+		};
+	})
 	.case(InputAction, (state, text) => ({
 		...state,
 		text,
+		result: calcResult(state.result, state.lambda, state.text),
 	}))
-	.case(AddAction, state => ({
-		...state,
-		inProgress: [...state.inProgress, state.text],
-		text: "",
-	}))
-	.case(FinishAction, (state, index) => {
-		const inProgress = [...state.inProgress]
-		const finished = [...state.finished, state.inProgress[index]]
-		inProgress.splice(index, 1)
-		return {
-			...state,
-			finished,
-			inProgress,
-		}
-	})
-	.default(state => state)
+	.default(state => state);
