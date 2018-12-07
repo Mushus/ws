@@ -1,9 +1,10 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const path = require('path');
 
 module.exports = {
   entry: [
-    './src/index.tsx'
+    './src/index.tsx',
   ],
   module: {
     rules: [
@@ -25,10 +26,20 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.scss$/,
+        use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            "css-loader",
+            "sass-loader"
+        ]
+      }
     ],
   },
   resolve: {
-    extensions: [ '.tsx', '.ts', '.js' ],
+    extensions: [ '.tsx', '.ts', '.js', '.scss' ],
     alias: {
       '@': path.resolve(__dirname, 'src/'),
     },
@@ -38,6 +49,9 @@ module.exports = {
     filename: 'bundle.js',
   },
   plugins: [
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+    }),
     new HtmlWebpackPlugin({
       title: 'React App',
       template: 'assets/index.html',
