@@ -17,15 +17,17 @@ const mapStateToProps = ({ todo: { result } }: IState): StateProp => ({
 
 const mapDispatchToProps = (dispatch: any): ActionProps => ({});
 
-const InputArea = styled.textarea`
-	box-sizing: border-box;
+const OutputArea = styled.div`
 	width: 100%;
 	height: 100%;
+	color: #ccc;
+	background-color: #1d1f21;
+	overflow: auto;
+	white-space: pre-wrap;
 `;
 
 const component = ({ result }: Props) => {
-	console.log(result);
-	return <div>result: {result}</div>;
+	return <OutputArea>{result}</OutputArea>;
 };
 
 const container = connect(

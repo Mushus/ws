@@ -28,8 +28,9 @@ export const FinishAction = actionCreator<number>('FINISH');
 function calcResult(result: any, lambda: string, input: any): any {
 	try {
 		return eval(`${lambda}`)(input);
-	} catch (e) {}
-	return result;
+	} catch (e) {
+		return result;
+	}
 }
 
 export const reducer = reducerWithInitialState<IState>(initalState)
@@ -43,6 +44,6 @@ export const reducer = reducerWithInitialState<IState>(initalState)
 	.case(InputAction, (state, text) => ({
 		...state,
 		text,
-		result: calcResult(state.result, state.lambda, state.text),
+		result: calcResult(state.result, state.lambda, text),
 	}))
 	.default(state => state);
