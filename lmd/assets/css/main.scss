@@ -1,16 +1,39 @@
-@import url("~normalize.css");
+@import url('~normalize.css');
 
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #34383B;
-    //#1D1F21;
-    //#34383B;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #34383b;
+  //#1D1F21;
+  //#34383B;
 }
 
 .app {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
+
+// おまじないはじめ
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  letter-spacing: 0.1rem;
+  line-height: 1.75;
+  -webkit-text-size-adjust: 100%;
+  font-feature-settings: 'palt';
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  ::i-block-chrome,
+  body {
+    font-feature-settings: 'pkna';
+  }
+}
+
+// おまじないおわり

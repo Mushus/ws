@@ -1,10 +1,10 @@
-import { IState as todoState, reducer as todoReducer } from '@/modules/todo';
+import { IState as MainState, reducer as mainReducer } from '@/modules/main';
 import { combineReducers } from 'redux';
 
 export interface IState {
-	todo: todoState;
+	main: MainState;
 }
 
 export const reducer = combineReducers<IState>({
-	todo: todoReducer,
+	main: mainReducer,
 });

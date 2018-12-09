@@ -3,38 +3,43 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import AceEditor from 'react-ace';
 import { IState } from '@/modules';
-import { InputLambda } from '@/modules/todo';
+import { InputFormulaAction, CalcResultAction } from '@/modules/main';
 
 import 'brace/mode/java';
 import 'brace/theme/tomorrow_night';
 
 interface StateProp {
-	lambda: string;
+	formula: string;
 }
 
 interface ActionProps {
-	inputLambda: (text: string) => void;
+	inputFormula: (formula: string) => void;
+	calcResult: () => void;
 }
 
 type Props = StateProp & ActionProps;
 
-const mapStateToProps = ({ todo: { lambda } }: IState): StateProp => ({
-	lambda,
+const mapStateToProps = ({ main: { formula } }: IState): StateProp => ({
+	formula,
 });
 
 const mapDispatchToProps = (dispatch: any): ActionProps => ({
-	inputLambda: text => dispatch(InputLambda(text)),
+	inputFormula: formula => dispatch(InputFormulaAction(formula)),
+	calcResult: () => dispatch(CalcResultAction()),
 });
 
-const component = ({ lambda, inputLambda }: Props) => {
+const component = ({ formula, inputFormula, calcResult }: Props) => {
 	return (
 		<AceEditor
 			mode="javascript"
 			theme="tomorrow_night"
 			width="100%"
 			height="100%"
-			value={lambda}
-			onChange={text => inputLambda(text)}
+			value={formula}
+			onChange={formula => {
+				inputFormula(formula);
+				calcResult();
+			}}
 		/>
 	);
 };

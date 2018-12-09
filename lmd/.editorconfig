@@ -38,3 +38,8 @@ indent_size = 4
 [*.{htm,html}]
 indent_style = space
 indent_size = 2
+
+# CSS
+[*.{css,scss}]
+indent_style = space
+indent_size = 2

@@ -11,7 +11,7 @@ interface ActionProps {}
 
 type Props = StateProp & ActionProps;
 
-const mapStateToProps = ({ todo: { result } }: IState): StateProp => ({
+const mapStateToProps = ({ main: { result } }: IState): StateProp => ({
 	result,
 });
 
