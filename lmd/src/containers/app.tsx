@@ -10,9 +10,9 @@ const PaneBox = styled.div`
 	height: 100%;
 	display: grid;
 	grid-template:
-		'left r-top' 1fr
-		'left r-bottom' 1fr
-		/ 1fr 1fr;
+		'left center r-top' 1fr
+		'left center r-bottom' 1fr
+		/ 1fr 10px 1fr;
 	grid-gap: 10px;
 `;
 const LeftArea = styled.div`

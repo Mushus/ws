@@ -22,14 +22,20 @@ const mapDispatchToProps = (dispatch: any): ActionProps => ({
 	input: text => dispatch(InputAction(text)),
 });
 
-const InputArea = styled.textarea`
-	box-sizing: border-box;
-	display: block;
+const Root = styled.div`
+	display: grid;
 	width: 100%;
 	height: 100%;
-	border: 0 none;
-	color: #ccc;
 	background-color: #1d1f21;
+	grid-template:
+		'top' 20px
+		'bottom' 1fr
+		/ 1fr;
+`;
+const InputArea = styled.textarea`
+	display: block;
+	color: #ccc;
+	border: 0 none;
 	overflow: auto;
 
 	:focus {
@@ -37,16 +43,33 @@ const InputArea = styled.textarea`
 		border-color: orange;
 	}
 `;
+const ControllBox = styled.div`
+	width
+`;
 
 const component = ({ input, text }: Props) => {
 	return (
-		<InputArea
-			value={text}
-			onChange={e => {
-				console.log(e.target.value);
-				input(e.target.value);
-			}}
-		/>
+		<Root>
+			<ControllBox>
+				<select>
+					<option value="text">テキスト全体</option>
+					<option value="">一行ごと</option>
+					<option value="json">JSON</option>
+					<option value="csv">CSV</option>
+					<option value="tsv">TSV</option>
+				</select>
+				<button type="button">入力から</button>
+				<button type="button">ファイルから</button>
+			</ControllBox>
+			<InputArea
+				placeholder="input here"
+				value={text}
+				onChange={e => {
+					console.log(e.target.value);
+					input(e.target.value);
+				}}
+			/>
+		</Root>
 	);
 };
 
