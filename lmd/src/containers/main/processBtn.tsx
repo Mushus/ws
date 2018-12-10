@@ -17,7 +17,7 @@ export default () => (
 			</marker>
 		</defs>
 		<polyline
-			points="80,5 20,5 20,70"
+			points="70,5 20,5 20,70"
 			style={{
 				fill: 'transparent',
 				stroke: '#fff',
@@ -41,7 +41,7 @@ export default () => (
 			λ(x)
 		</text>
 		<polyline
-			points="20,130 20,195 80,195"
+			points="20,130 20,195 70,195"
 			style={{
 				fill: 'transparent',
 				stroke: '#fff',

@@ -122,6 +122,7 @@ const TabArea = styled.div`
 		height: ${controlHeight};
 		font-size: ${fontSize};
 		background-color: #35393b;
+		color: #c4c8c6;
 	}
 	label.active {
 		background-color: #1d1f20;

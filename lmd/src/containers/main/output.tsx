@@ -27,7 +27,32 @@ const OutputArea = styled.div`
 `;
 
 const component = ({ result }: Props) => {
+	if (typeof result === 'object') {
+		return <OutputArea>{createObjectDOM(result)}</OutputArea>;
+	}
 	return <OutputArea>{result}</OutputArea>;
+};
+
+const createObjectDOM = (result: any): JSX.Element | string | null => {
+	if (result == null) {
+		return null;
+	} else if (typeof result === 'object') {
+		const keys = Object.keys(result);
+		return (
+			<div>
+				{'{'}
+				{keys.map((key, index) => (
+					<details key={key}>
+						<summary>{JSON.stringify(key)}:</summary>
+						{createObjectDOM(result[key])}
+						{index !== keys.length - 1 && ','}
+					</details>
+				))}
+				{'{'}
+			</div>
+		);
+	}
+	return JSON.stringify(result);
 };
 
 const container = connect(
