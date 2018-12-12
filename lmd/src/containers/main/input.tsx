@@ -60,8 +60,8 @@ const component = ({ tab, input, changeTab, inputText, calcResult }: Props) => {
 				</TabArea>
 				<OptionArea>
 					<select>
-						<option value="text">テキスト全体</option>
-						<option value="">一行ごと</option>
+						<option value="text">テキスト</option>
+						<option value="">行区切り</option>
 						<option value="json">JSON</option>
 						<option value="csv">CSV</option>
 						<option value="tsv">TSV</option>
@@ -78,7 +78,9 @@ const component = ({ tab, input, changeTab, inputText, calcResult }: Props) => {
 					}}
 				/>
 			</InputField>
-			<InputField className={tab === 'file' ? 'active' : 'inactive'} />
+			<InputField className={tab === 'file' ? 'active' : 'inactive'}>
+				未実装
+			</InputField>
 		</Root>
 	);
 };

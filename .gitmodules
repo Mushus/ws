@@ -7,3 +7,6 @@
 [submodule "toolbox"]
 	path = toolbox
 	url = https://github.com/Mushus/toolbox
+[submodule "presentations"]
+	path = presentations
+	url = git@github.com:Mushus/presentations.git

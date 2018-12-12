@@ -1,11 +1,17 @@
 import actionCreatorFactory from 'typescript-fsa';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
+export interface IFile {
+	name: string;
+}
+
 export interface IState {
 	formula: string;
 	input: string;
 	tab: string;
 	result: any;
+	selectedFile: number;
+	fileList: Array<IFile>;
 }
 
 const initalState: IState = {
@@ -13,6 +19,12 @@ const initalState: IState = {
 	input: '',
 	tab: 'text',
 	result: null,
+	selectedFile: 0,
+	fileList: [
+		{
+			name: 'hoge',
+		},
+	],
 };
 
 const actionCreator = actionCreatorFactory();
