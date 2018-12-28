@@ -10,9 +10,6 @@
 			"path": "til"
 		},
 		{
-			"path": "apart"
-		},
-		{
 			"path": "app"
 		},
 		{
@@ -32,6 +29,12 @@
 		},
 		{
 			"path": "presentations"
+		},
+		{
+			"path": "_apart"
+		},
+		{
+			"path": "apart"
 		}
 	],
 	"settings": {}

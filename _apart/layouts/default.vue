@@ -1,7 +1,7 @@
 <template>
   <div>
     <header>
-
+      <h1>物件管理システム</h1>
     </header>
     <Sidenav/>
     <main>
@@ -18,7 +18,7 @@ import {
   Component,
   Vue
 } from "nuxt-property-decorator"
-import Sidenav from "~/components/Sidenav.vue"
+import Sidenav from "~/components/Sidenav"
 
 @Component({
   components: {

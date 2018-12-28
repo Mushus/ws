@@ -1,68 +1,56 @@
-const parseArgs = require("minimist")
-const argv = parseArgs(process.argv.slice(2), {
-  alias: {
-    H: "hostname",
-    p: "port"
-  },
-  string: ["H"],
-  unknown: parameter => false
-})
+const pkg = require('./package');
+const extendConfig = require('./webpack.config.extend');
 
-const port =
-  argv.port ||
-  process.env.PORT ||
-  process.env.npm_package_config_nuxt_port ||
-  "3000"
-const host =
-  argv.hostname ||
-  process.env.HOST ||
-  process.env.npm_package_config_nuxt_host ||
-  "localhost"
 module.exports = {
-  env: {
-    baseUrl:
-      process.env.BASE_URL ||
-      `http://${host}:${port}`
-  },
+  mode: 'spa',
+
+  srcDir: './src',
+  /*
+  ** Headers of the page
+  */
   head: {
-    title: "tt1",
+    title: pkg.name,
     meta: [
-      { charset: "utf-8" },
-      {
-        name: "viewport",
-        content:
-          "width=device-width, initial-scale=1"
-      },
-      {
-        hid: "description",
-        name: "description",
-        content: "Nuxt.js project"
-      }
+      { charset: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { hid: 'description', name: 'description', content: pkg.description }
     ],
-    link: [
-      {
-        rel: "icon",
-        type: "image/x-icon",
-        href: "/favicon.ico"
-      }
-    ]
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
   },
+
   /*
   ** Customize the progress-bar color
   */
-  loading: { color: "#3B8070" },
+  loading: { color: '#fff' },
+
+  /*
+  ** Global CSS
+  */
+  css: [],
+
+  /*
+  ** Plugins to load before mounting the App
+  */
+  plugins: ['@/plugins/firebase'],
+
+  /*
+  ** Nuxt.js modules
+  */
+  modules: ['@nuxtjs/axios', ['@nuxtjs/dotenv', { path: __dirname }]],
+
   /*
   ** Build configuration
   */
-  css: ["~/assets/css/main.css"],
-  build: {},
-  modules: [
-    '@nuxtjs/dotenv',
-    "@nuxtjs/axios",
-    "~/modules/typescript.js"
-  ],
-  axios: {},
-  generate: {
-    dir: "public"
-  }
-}
+  build: {
+    /*
+    ** You can extend webpack config here
+    */
+    extend(config, ctx) {
+      extendConfig(config, ctx);
+    }
+  },
+  router: {
+    mode: 'hash'
+  },
+  middleware: ['authenticated']
+};

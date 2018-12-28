@@ -17,7 +17,7 @@ const mapStateToProps = ({ main: { result } }: IState): StateProp => ({
 
 const mapDispatchToProps = (dispatch: any): ActionProps => ({});
 
-const OutputArea = styled.div`
+const OutputArea = styled.pre`
 	width: 100%;
 	height: 100%;
 	color: #ccc;
@@ -27,16 +27,11 @@ const OutputArea = styled.div`
 `;
 
 const component = ({ result }: Props) => {
-	if (typeof result === 'object') {
-		return <OutputArea>{createObjectDOM(result)}</OutputArea>;
-	}
-	return <OutputArea>{result}</OutputArea>;
+	return <OutputArea>{JSON.stringify(result, null, '\t')}</OutputArea>;
 };
 
 const createObjectDOM = (result: any): JSX.Element | string | null => {
-	if (result == null) {
-		return null;
-	} else if (typeof result === 'object') {
+	if (result != null && typeof result === 'object') {
 		const keys = Object.keys(result);
 		return (
 			<div>

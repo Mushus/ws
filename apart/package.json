@@ -1,25 +1,37 @@
 {
   "name": "apart",
   "version": "1.0.0",
+  "description": "My ace Nuxt.js project",
+  "author": "Mushus",
   "private": true,
-  "dependencies": {
-    "@nuxtjs/axios": "^5.0.0",
-    "@nuxtjs/dotenv": "^1.3.0",
-    "firebase": "^5.5.9",
-    "nuxt": "^1.3.0",
-    "nuxt-property-decorator": "^1.2.0",
-    "vuex-class": "^0.3.0"
-  },
   "scripts": {
-    "dev": "nuxt",
+    "dev": "cross-env NODE_ENV=development nodemon src/server/index.js --watch server",
     "build": "nuxt build",
-    "start": "nuxt start",
-    "generate": "nuxt generate"
+    "start": "cross-env NODE_ENV=production node src/server/index.js",
+    "generate": "nuxt generate",
+    "lint": "tslint --ext .js,.vue --ignore-path .gitignore . --fix",
+    "precommit": "npm run lint",
+    "firebase:login": "firebase login"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/dotenv": "^1.3.0",
+    "cross-env": "^5.2.0",
+    "express": "^4.16.3",
+    "firebase": "^5.7.1",
+    "nuxt": "^2.0.0",
+    "nuxt-class-component": "^1.2.1"
   },
   "devDependencies": {
-    "@types/node": "^9.4.6",
-    "firebase-tools": "^6.0.1",
-    "ts-loader": "^3.5.0",
-    "typescript": "^2.7.2"
+    "@types/node": "^10.12.18",
+    "babel-eslint": "^8.2.1",
+    "eslint": "^5.0.1",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-prettier": "2.6.2",
+    "eslint-plugin-vue": "^4.0.0",
+    "firebase-tools": "^6.2.2",
+    "nodemon": "^1.11.0",
+    "prettier": "1.14.3"
   }
 }

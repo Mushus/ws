@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Hello world!</h2>
+    <h2>ダッシュボード</h2>
     <ul>
       <li v-for="article in articles" :key="article.id">{{ article.name }}</li>
     </ul>
@@ -13,7 +13,7 @@ import {
   Vue
 } from "nuxt-property-decorator"
 import { State } from "vuex-class"
-import Card from "~/components/Card.vue"
+import Card from "~/components/Card"
 
 @Component({
   components: {

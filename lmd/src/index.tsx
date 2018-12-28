@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import App from '@/containers/app';
+import LocalDb from '@/repository/LocalDb';
 import { reducer } from '@/modules';
 import '../assets/css/main.scss';
 
@@ -14,3 +15,5 @@ render(
 	</Provider>,
 	document.querySelector('.app'),
 );
+
+new LocalDb();
