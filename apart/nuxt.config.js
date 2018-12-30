@@ -36,7 +36,11 @@ module.exports = {
   /*
   ** Nuxt.js modules
   */
-  modules: ['@nuxtjs/axios', ['@nuxtjs/dotenv', { path: __dirname }]],
+  modules: [
+    'bootstrap-vue/nuxt',
+    '@nuxtjs/axios',
+    ['@nuxtjs/dotenv', { path: __dirname }]
+  ],
 
   /*
   ** Build configuration
@@ -51,6 +55,5 @@ module.exports = {
   },
   router: {
     mode: 'hash'
-  },
-  middleware: ['authenticated']
+  }
 };

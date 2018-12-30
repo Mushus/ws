@@ -9,27 +9,54 @@ const store = new Vuex.Store({
     user: null,
     token: null
   }),
+  getters: {
+    loggedIn(state) {
+      return state.user !== null;
+    }
+  },
   mutations: {
-    [SESSION_LOGIN](_, { user }) {
-      this.user = user;
+    [SESSION_LOGIN](state, { user }) {
+      state.user = user;
     },
     [SESSION_LOGOUT]() {
       this.user = null;
     }
   },
-  actions: {}
+  actions: {
+    // ログイン
+    [SESSION_LOGIN]({ commit }, { user }) {
+      const routeName = this.app.context.route.name;
+      commit(SESSION_LOGIN, { user });
+      // ログイン画面からのログインではインデックスに飛ばす
+      if (routeName === 'session-login') {
+        this.$router.replace({ name: 'index' });
+      }
+    },
+    // ログアウト
+    [SESSION_LOGOUT]({ commit }) {
+      const login = { name: 'session-login' };
+      if (this.getters.loggedIn) {
+        // ログインしている場合はログアウトを行う
+        auth.signOut().then(() => {
+          commit(SESSION_LOGOUT);
+          this.$router.replace(login);
+        });
+      } else {
+        this.$router.replace(login);
+      }
+    }
+  }
 });
 
 auth.onAuthStateChanged(user => {
-  console.log(user);
   if (user) {
-    store.commit(SESSION_LOGIN, {
+    store.dispatch(SESSION_LOGIN, {
       user: {
         email: user.email
       }
     });
   } else {
-    store.commit(SESSION_LOGOUT);
+    store.dispatch(SESSION_LOGOUT);
   }
 });
 

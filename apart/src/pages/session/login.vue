@@ -12,19 +12,20 @@
           <dt><label for="password">パスワード</label></dt>
           <dd><input type="password" id="password" v-model="password"></dd>
         </dl>
-        <button type="submit">ログイン</button>
+        <button type="submit" :disabled="isProcessing">ログイン</button>
       </form>
     </section>
   </section>
 </template>
 
 <script>
-
 import Vue from "vue";
 
 export default Vue.extend({
+  layout: 'anonymous',
   data() {
     return {
+      isProcessing: false,
       email: '',
       password: '',
       error: '',
@@ -34,6 +35,8 @@ export default Vue.extend({
     login() {
       // 通信中にエラーを消えるようにする
       this.error = '';
+      this.isProcessing = true;
+
       const email = this.email;
       const password = this.password;
       this.$auth.signInWithEmailAndPassword(email, password).catch(e => {
@@ -41,9 +44,9 @@ export default Vue.extend({
         const errorMessage = e.message;
         // 画面にエラーを表示する
         this.error = `${errorCode}: ${errorMessage}`;
+        this.isProcessing = false;
       });
     }
-  },
-  layout: 'anonymous'
+  }
 });
 </script>

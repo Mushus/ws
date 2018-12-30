@@ -1,12 +1,12 @@
 <template>
   <section>
     <h2>物件作成</h2>
-    <form @submit="submit">
+    <form @submit="e => (submit(), false)">
       <section>
-        <label for="name">物件名</label>
-        <input id="name" type="text" v-model="input.name" />
-      </section>
-      <section>
+        <dl>
+          <dt><label for="article_name">物件名</label></dt>
+          <dd><input id="article_name" type="text" v-model="article.data.name" /></dd>
+        </dl>
         <button type="submit">作成する</button>
       </section>
     </form>
@@ -19,20 +19,32 @@ import Vue from "vue"
 export default Vue.extend({
   data() {
     return {
-      input: {
-        name: ''
+      article: {
+        id: null,
+        data: {
+          name: '',
+        },
       }
     }
   },
   methods: {
-    submit() {
-      this.$firestore
-        .collection('articles')
-        .add(this.input)
-        .then(e => console.log(e))
-        .catch(e => console.log(e))
-      return false
+    async submit() {
+      const articlesRef = this.$firestore.collection('articles');
+      try {
+        const article = await articlesRef.add(this.article.data);
+        console.log(article)
+        this.$router.push({
+          name: 'articles-id',
+          params: {
+            id: article.id,
+          },
+        });
+      } catch(e) {
+        console.log(e);
+        return error({ statusCode: 500, message: 'データ取得失敗' });
+      }
     }
   }
 })
 </script>
+
