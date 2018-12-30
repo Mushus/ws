@@ -1,8 +1,8 @@
 <template>
-  <div class="container">
-    <header>
-      <h1>物件管理システム</h1>
-    </header>
+  <div>
+    <b-navbar toggleable="md" type="dark" variant="info">
+      <b-navbar-brand :to="{ name: 'index'}">物件管理システム</b-navbar-brand>
+    </b-navbar>
     <main>
       <nuxt />
     </main>

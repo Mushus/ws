@@ -1,27 +1,37 @@
 <template>
   <section>
-    <h2>物件更新</h2>
-    <form @submit="e => (submit(), false)">
-      <section>
-        <dl>
-          <dt><label for="article_name">物件名</label></dt>
-          <dd><input id="article_name" type="text" v-model="article.data.name" /></dd>
-        </dl>
-        <section>
-          <button type="button" @click="addRoom()">追加</button>
-        </section>
-        <ul>
-           <li v-for="(room, index) in rooms" :key="room.key">
-             <dl>
-               <dt><label :for="`room_name_${index}`">部屋名</label></dt>
-               <dd><input type="text" :id="`room_name_${index}`" v-model="room.data.name" /></dd>
-             </dl>
-             <button type="button" @click="removeRoom(index)">削除</button>
-           </li>
-        </ul>
-        <button type="submit">更新する</button>
-      </section>
-    </form>
+    <b-navbar class="pt-3">
+      <h2>物件詳細</h2>
+      <b-button-toolbar>
+        <b-button-group>
+          <b-button :to="{ name: 'articles-create' }">一覧へ</b-button>
+        </b-button-group>
+      </b-button-toolbar>
+    </b-navbar>
+    <b-form @submit="e => (submit(), false)">
+      <b-form-group label="建物名">
+        <b-input type="text" v-model="article.data.name" />
+      </b-form-group>
+      <b-button-group class="d-block pb-3">
+        <b-button type="button" @click="addRoom()">追加</b-button>
+      </b-button-group>
+      <b-list-group class="pb-3" v-if="rooms.length !== 0">
+        <b-list-group-item
+          v-for="(room, index) in rooms"
+          :key="room.key"
+          >
+          <b-form-group label="部屋名">
+            <b-input type="text" :id="`room_name_${index}`" v-model="room.data.name" />
+          </b-form-group>
+          <b-button-group>
+            <b-button type="button" variant="danger" @click="removeRoom(index)">削除</b-button>
+          </b-button-group>
+        </b-list-group-item>
+      </b-list-group>
+      <b-button-group>
+        <b-button variant="primary" type="submit">更新する</b-button>
+      </b-button-group>
+    </b-form>
   </section>
 </template>
 
@@ -77,6 +87,7 @@ export default Vue.extend({
         key: shortid.generate(),
         id: null,
         data: {
+          articleId: this.article.id,
           name: '',
           index: lastIndex,
         },
@@ -123,7 +134,6 @@ export default Vue.extend({
             // 追加したのでバッファーから削除
             roomUpdateQueue.splice(index, 1);
           })
-          console.log(roomUpdateQueue)
           // 新規追加
           roomUpdateQueue.forEach(room => roomsRef.add(room.data));
         } catch(e) {

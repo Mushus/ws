@@ -1,14 +1,9 @@
 class as section as template; = "container" >
 <template>
   <section>
-    <h2>物件管理</h2>
-    <ul>
-      <li>
-        <nuxt-link :to="{ path: '/receipts', params: {} }">
-          hoge
-        </nuxt-link>
-      </li>
-    </ul>
+    <b-navbar class="pt-3">
+      <h2>物件一覧</h2>
+    </b-navbar>
   </section>
 </template>
 

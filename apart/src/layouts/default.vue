@@ -1,18 +1,30 @@
 <template>
-  <div class="container" v-if="loggedIn">
-    <header>
-      <h1>物件管理システム</h1>
-    </header>
-    <nav>
-      <ul>
-        <li><nuxt-link :to="{ name: 'articles' }">物件管理</nuxt-link></li>
-        <li><nuxt-link :to="{ name: 'receipts' }">領収書印刷</nuxt-link></li>
-        <li><nuxt-link :to="{ name: 'session-logout' }">ログアウト</nuxt-link></li>
-      </ul>
-    </nav>
-    <main>
-      <nuxt />
-    </main>
+  <div v-if="loggedIn">
+    <b-navbar toggleable="md" type="dark" variant="info">
+      <b-navbar-brand :to="{ name: 'index'}">物件管理システム</b-navbar-brand>
+      <b-navbar-nav class="ml-auto">
+        <b-nav-item-dropdown :text="user.email" right>
+          <b-dropdown-item @click="$router.push({ name: 'session-logout' })">ログアウト</b-dropdown-item>
+        </b-nav-item-dropdown>
+      </b-navbar-nav>
+    </b-navbar>
+    <b-container fluid>
+      <b-row>
+        <b-col class="pl-0 pr-0" cols="2">
+          <b-nav vertical class="pt-2">
+            <b-nav-item :to="{ name: 'index' }">ダッシュボード</b-nav-item>
+            <b-nav-item :to="{ name: 'articles' }">物件管理</b-nav-item>
+            <b-nav-item :to="{ name: 'tenants' }">入居者管理</b-nav-item>
+            <b-nav-item :to="{ name: 'receipts' }">領収書印刷</b-nav-item>
+          </b-nav>
+        </b-col>
+        <b-col>
+          <b-container tag="main">
+            <nuxt />
+          </b-container>
+        </b-col>
+      </b-row>
+    </b-container>
     <footer />
   </div>
 </template>
@@ -22,8 +34,11 @@ import Vue from 'vue';
 
 export default Vue.extend({
   computed: {
+    user() {
+      return this.$store.getters.user;
+    },
     loggedIn() {
-      return this.$store.getters.loggedIn
+      return this.$store.getters.loggedIn;
     }
   }
 })

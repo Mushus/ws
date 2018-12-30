@@ -1,16 +1,22 @@
 <template>
   <section>
-    <h2>物件一覧</h2>
-    <section>
-      <nuxt-link :to="{ name: 'articles-create' }">物件を作成する</nuxt-link>
-    </section>
-    <ul>
-      <li v-for="article in articles" :key="article.id">
-        <nuxt-link :to="{ name:'articles-id', params: { id: article.id } }">
-          {{ article.data.name }}
-        </nuxt-link>
-      </li>
-    </ul>
+    <b-navbar class="pt-3">
+      <h2>物件一覧</h2>
+      <b-button-toolbar>
+        <b-button-group>
+          <b-button :to="{ name: 'articles-create' }" variant="primary">物件を作成する</b-button>
+        </b-button-group>
+      </b-button-toolbar>
+    </b-navbar>
+    <b-list-group class="pt-3">
+      <b-list-group-item
+        v-for="article in articles"
+        :key="article.id"
+        :to="{ name:'articles-id', params: { id: article.id } }"
+        >
+        {{ article.data.name }}
+      </b-list-group-item>
+    </b-list-group>
   </section>
 </template>
 

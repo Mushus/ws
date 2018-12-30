@@ -1,15 +1,21 @@
 <template>
   <section>
-    <h2>物件作成</h2>
-    <form @submit="e => (submit(), false)">
-      <section>
-        <dl>
-          <dt><label for="article_name">物件名</label></dt>
-          <dd><input id="article_name" type="text" v-model="article.data.name" /></dd>
-        </dl>
-        <button type="submit">作成する</button>
-      </section>
-    </form>
+    <b-navbar class="pt-3">
+      <h2>物件作成</h2>
+      <b-button-toolbar>
+        <b-button-group>
+          <b-button :to="{ name: 'articles-create' }">一覧へ</b-button>
+        </b-button-group>
+      </b-button-toolbar>
+    </b-navbar>
+    <b-form @submit="e => (submit(), false)">
+      <b-form-group label="建物名">
+        <b-form-input type="text" v-model="article.data.name" />
+      </b-form-group>
+      <b-button-group>
+        <b-button variant="primary" type="submit">作成する</b-button>
+      </b-button-group>
+    </b-form>
   </section>
 </template>
 
@@ -41,7 +47,6 @@ export default Vue.extend({
         });
       } catch(e) {
         console.log(e);
-        return error({ statusCode: 500, message: 'データ取得失敗' });
       }
     }
   }
