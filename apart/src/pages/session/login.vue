@@ -5,7 +5,7 @@
       <div class="message-error" v-if="error !== ''">
         {{ error }}
       </div>
-      <form @submit="e => (login(), false)">
+      <form @submit.prevent="login($event)">
         <dl>
           <dt><label for="email">メールアドレス</label></dt>
           <dd><input type="email" id="email" v-model="email"></dd>
@@ -32,7 +32,8 @@ export default Vue.extend({
     }
   },
   methods: {
-    login() {
+    login(event) {
+      if (event != null) event.preventDefault();
       // 通信中にエラーを消えるようにする
       this.error = '';
       this.isProcessing = true;
@@ -46,6 +47,8 @@ export default Vue.extend({
         this.error = `${errorCode}: ${errorMessage}`;
         this.isProcessing = false;
       });
+
+      return false;
     }
   }
 });

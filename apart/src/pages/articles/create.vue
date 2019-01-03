@@ -4,7 +4,7 @@
       <h2>物件作成</h2>
       <b-button-toolbar>
         <b-button-group>
-          <b-button :to="{ name: 'articles-create' }">一覧へ</b-button>
+          <b-button :to="{ name: 'articles' }">一覧へ</b-button>
         </b-button-group>
       </b-button-toolbar>
     </b-navbar>
@@ -29,6 +29,8 @@ export default Vue.extend({
         id: null,
         data: {
           name: '',
+          commonAreaCharge: 0,
+          parkingFee: 0,
         },
       }
     }
@@ -38,7 +40,6 @@ export default Vue.extend({
       const articlesRef = this.$firestore.collection('articles');
       try {
         const article = await articlesRef.add(this.article.data);
-        console.log(article)
         this.$router.push({
           name: 'articles-id',
           params: {

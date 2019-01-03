@@ -8,14 +8,15 @@
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-navbar>
-    <b-container fluid>
+    <b-container fluid class="pb-5">
       <b-row>
         <b-col class="pl-0 pr-0" cols="2">
-          <b-nav vertical class="pt-2">
+          <b-nav vertical class="pt-2 sidenav">
             <b-nav-item :to="{ name: 'index' }">ダッシュボード</b-nav-item>
             <b-nav-item :to="{ name: 'articles' }">物件管理</b-nav-item>
             <b-nav-item :to="{ name: 'tenants' }">入居者管理</b-nav-item>
-            <b-nav-item :to="{ name: 'receipts' }">領収書印刷</b-nav-item>
+            <b-nav-item :to="{ name: 'occupants' }">入居状況の確認</b-nav-item>
+            <b-nav-item :to="{ name: 'print' }">書類印刷</b-nav-item>
           </b-nav>
         </b-col>
         <b-col>
@@ -25,7 +26,6 @@
         </b-col>
       </b-row>
     </b-container>
-    <footer />
   </div>
 </template>
 

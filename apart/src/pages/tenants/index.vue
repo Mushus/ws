@@ -8,9 +8,9 @@
         </b-button-group>
       </b-button-toolbar>
     </b-navbar>
-    <b-table hover fixed="true" :fields="fields" :items="items">
+    <b-table :fixed="true" :fields="fields" :items="items">
       <template slot="control" slot-scope="data">
-        <b-button @click="e => tenantLink(data.item.id)">編集</b-button>
+        <b-button :to="{ name: 'tenants-id', params: { id: data.item.id } }">編集する</b-button>
       </template>
     </b-table>
   </section>

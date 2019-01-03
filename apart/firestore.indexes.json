@@ -1,4 +1,19 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionId": "rooms",
+      "fields": [
+        { "fieldPath": "articleId", "mode": "ASCENDING" },
+        { "fieldPath": "index", "mode": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionId": "tenants",
+      "fields": [
+        { "fieldPath": "articleId", "mode": "ASCENDING" },
+        { "fieldPath": "moveOutAt", "mode": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

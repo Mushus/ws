@@ -23,14 +23,51 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  data() {
-    return {
-      tenant: {
-        id: null,
-        data: {
-          'name': '',
-        }
+  async asyncData({ error, params, $firestore }) {
+    const tenantId = params.id;
+
+    const tenantRef = $firestore.collection('tenants').doc(tenantId);
+    const articlesRef = $firestore.collection('articles');
+    const roomsRef = $firestore.collection('article');
+
+    let tenant;
+    let articles = [];
+    let rooms = [];
+    try {
+      const tenantDoc = await tenantRef.get();
+      // 記事が存在しなければ表示できないので404にする
+      if (!tenantDoc.exists) {
+        return error({ statusCode: 404, message: '指定された入居者が存在しません' });
       }
+
+      tenant = {
+        id: tenantDoc.id,
+        data: tenantDoc.data(),
+      };
+
+      await Promise.all([
+        (async () => {
+          const articlesDoc = await articlesRef.get();
+          articlesDoc.forEach(article => articles.push({
+            id: article.id,
+            data: article.data(),
+          }));
+        }),
+        (async () => {
+          const roomsDoc = await roomsRef.get();
+          roomsDoc.forEach(room => rooms.push({
+            id: room.id,
+            data: room.data(),
+          }));
+        })
+      ]);
+    } catch(e) {
+      return error({ statusCode: 500, message: 'データ取得失敗' });
+    }
+    return {
+      tenant,
+      articles,
+      rooms,
     };
   },
   methods: {

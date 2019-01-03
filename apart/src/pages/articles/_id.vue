@@ -4,13 +4,33 @@
       <h2>物件詳細</h2>
       <b-button-toolbar>
         <b-button-group>
-          <b-button :to="{ name: 'articles-create' }">一覧へ</b-button>
+          <b-button :to="{ name: 'articles' }">一覧へ</b-button>
         </b-button-group>
       </b-button-toolbar>
     </b-navbar>
     <b-form @submit="e => (submit(), false)">
       <b-form-group label="建物名">
-        <b-input type="text" v-model="article.data.name" />
+        <b-input type="text" v-model="article.data.name" required />
+      </b-form-group>
+      <b-form-group label="共益費">
+        <b-input-group append="円 / 月">
+          <b-form-input
+            type="number"
+            v-model="article.data.commonAreaCharge"
+            min="0"
+            required
+            />
+        </b-input-group>
+      </b-form-group>
+      <b-form-group label="駐車場料金">
+        <b-input-group append="円 / 月">
+          <b-form-input
+            type="number"
+            v-model="article.data.parkingFee"
+            min="0"
+            required
+            />
+        </b-input-group>
       </b-form-group>
       <b-button-group class="d-block pb-3">
         <b-button type="button" @click="addRoom()">追加</b-button>
@@ -21,7 +41,12 @@
           :key="room.key"
           >
           <b-form-group label="部屋名">
-            <b-input type="text" :id="`room_name_${index}`" v-model="room.data.name" />
+            <b-form-input type="text" v-model="room.data.name" required />
+          </b-form-group>
+          <b-form-group label="家賃">
+            <b-input-group append="円 / 月">
+              <b-form-input type="text" v-model="room.data.rent" required />
+            </b-input-group>
           </b-form-group>
           <b-button-group>
             <b-button type="button" variant="danger" @click="removeRoom(index)">削除</b-button>
@@ -36,8 +61,8 @@
 </template>
 
 <script>
-import shortid from 'shortid'
-import Vue from 'vue'
+import shortid from 'shortid';
+import Vue from 'vue';
 
 export default Vue.extend({
   async asyncData({ params, error, $firestore }) {
@@ -54,7 +79,7 @@ export default Vue.extend({
 
       // 記事が存在しなければ表示できないので404にする
       if (!articleDoc.exists) {
-        return error({ statusCode: 404, message: '記事が存在しません' });
+        return error({ statusCode: 404, message: '指定された物件が存在しません' });
       }
 
       article = {
@@ -62,7 +87,10 @@ export default Vue.extend({
         data: articleDoc.data()
       };
 
-      const roomsDoc = await roomsRef.where('articleId', '==', articleDoc.id).get();
+      const roomsDoc = await roomsRef
+        .where('articleId', '==', articleDoc.id)
+        .orderBy('index')
+        .get();
       roomsDoc.forEach(room => rooms.push({
         key: room.id,
         id: room.id,
@@ -90,6 +118,7 @@ export default Vue.extend({
           articleId: this.article.id,
           name: '',
           index: lastIndex,
+          rent: 0,
         },
       })
     },
@@ -125,7 +154,6 @@ export default Vue.extend({
             const storeRoom = roomsRef.doc(roomId)
             // 編集後存在しなくなった部屋は削除
             if (index === -1) {
-              console.log(roomId)
               return;
             }
             // 存在している既存の物件に対して更新

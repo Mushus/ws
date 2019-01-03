@@ -8,12 +8,12 @@
         </b-button-group>
       </b-button-toolbar>
     </b-navbar>
-    <b-form @submit="e => (submit(), false)">
+    <b-form @submit="e => submit()">
       <b-form-group label="氏名">
         <b-form-input type="text" v-model="tenant.data.name" required placeholder="山田太郎" />
       </b-form-group>
       <b-button-group>
-        <b-button type="submit" variant="primary">作成する</b-button>
+        <b-button type="submit" variant="primary">更新する</b-button>
       </b-button-group>
     </b-form>
   </section>
@@ -46,6 +46,20 @@ export default Vue.extend({
     return {
       tenant,
     };
+  },
+  methods: {
+    submit() {
+      const tenantsRef = this.$firestore.collection('tenants');
+      const tenantDoc = tenantsRef.doc(this.tenant.id);
+
+      try {
+        tenantDoc.update(this.tenant.data);
+      } catch(e) {
+        return console.log(e);
+      }
+
+      return false;
+    }
   }
 })
 </script>
