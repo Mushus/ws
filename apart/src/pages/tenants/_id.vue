@@ -1,14 +1,13 @@
 <template>
   <section>
-    <b-navbar class="pt-3">
+    <b-breadcrumb>
+      <b-breadcrumb-item :to="{ name: 'tenants' }">入居者一覧</b-breadcrumb-item>
+      <b-breadcrumb-item :active="true">入居者詳細</b-breadcrumb-item>
+    </b-breadcrumb>
+    <b-navbar>
       <h2>入居者詳細</h2>
-      <b-button-toolbar>
-        <b-button-group>
-          <b-button :to="{ name: 'tenants' }">一覧へ</b-button>
-        </b-button-group>
-      </b-button-toolbar>
     </b-navbar>
-    <b-form @submit="e => submit()">
+    <b-form @submit.prevent="submit()">
       <b-form-group label="氏名">
         <b-form-input type="text" v-model="tenant.data.name" required placeholder="山田太郎" />
       </b-form-group>

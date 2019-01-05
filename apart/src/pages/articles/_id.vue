@@ -1,6 +1,10 @@
 <template>
   <section>
-    <b-navbar class="pt-3">
+    <b-breadcrumb>
+      <b-breadcrumb-item :to="{ name: 'articles' }">物件一覧</b-breadcrumb-item>
+      <b-breadcrumb-item :active="true">物件詳細</b-breadcrumb-item>
+    </b-breadcrumb>
+    <b-navbar>
       <h2>物件詳細</h2>
       <b-button-toolbar>
         <b-button-group>
@@ -8,9 +12,12 @@
         </b-button-group>
       </b-button-toolbar>
     </b-navbar>
-    <b-form @submit="e => (submit(), false)">
+    <b-form @submit.prevent="submit()">
       <b-form-group label="建物名">
         <b-input type="text" v-model="article.data.name" required />
+      </b-form-group>
+      <b-form-group label="管理者">
+        <b-input type="text" v-model="article.data.administrator" required />
       </b-form-group>
       <b-form-group label="共益費">
         <b-input-group append="円 / 月">
@@ -33,7 +40,7 @@
         </b-input-group>
       </b-form-group>
       <b-button-group class="d-block pb-3">
-        <b-button type="button" @click="addRoom()">追加</b-button>
+        <b-button type="button" @click="addRoom()">部屋を追加する</b-button>
       </b-button-group>
       <b-list-group class="pb-3" v-if="rooms.length !== 0">
         <b-list-group-item

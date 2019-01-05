@@ -1,6 +1,10 @@
 <template>
   <section>
-    <b-navbar class="pt-3">
+    <b-breadcrumb>
+      <b-breadcrumb-item :to="{ name: 'articles' }">物件一覧</b-breadcrumb-item>
+      <b-breadcrumb-item :active="true">物件作成</b-breadcrumb-item>
+    </b-breadcrumb>
+    <b-navbar>
       <h2>物件作成</h2>
       <b-button-toolbar>
         <b-button-group>
@@ -8,7 +12,7 @@
         </b-button-group>
       </b-button-toolbar>
     </b-navbar>
-    <b-form @submit="e => (submit(), false)">
+    <b-form @submit.prevent="submit()">
       <b-form-group label="建物名">
         <b-form-input type="text" v-model="article.data.name" />
       </b-form-group>
@@ -29,6 +33,7 @@ export default Vue.extend({
         id: null,
         data: {
           name: '',
+          administrator: '',
           commonAreaCharge: 0,
           parkingFee: 0,
         },

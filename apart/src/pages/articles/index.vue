@@ -1,6 +1,9 @@
 <template>
   <section>
-    <b-navbar class="pt-3">
+    <b-breadcrumb>
+      <b-breadcrumb-item :active="true">物件一覧</b-breadcrumb-item>
+    </b-breadcrumb>
+    <b-navbar>
       <h2>物件一覧</h2>
       <b-button-toolbar>
         <b-button-group>

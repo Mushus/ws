@@ -1,12 +1,10 @@
 <template>
   <section>
-    <b-navbar class="pt-3">
+    <b-breadcrumb>
+      <b-breadcrumb-item :active="true">入居者一覧</b-breadcrumb-item>
+    </b-breadcrumb>
+    <b-navbar>
       <h2>入居者一覧</h2>
-      <b-button-toolbar>
-        <b-button-group>
-          <b-button :to="{ name: 'tenants-create' }" variant="primary">入居者を作成する</b-button>
-        </b-button-group>
-      </b-button-toolbar>
     </b-navbar>
     <b-table :fixed="true" :fields="fields" :items="items">
       <template slot="control" slot-scope="data">

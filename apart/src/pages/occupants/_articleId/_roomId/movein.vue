@@ -18,7 +18,7 @@
     <b-form-group label="部屋名">
       <b-form-input type="text" :value="room.data.name" readonly />
     </b-form-group>
-    <b-form @submit="e => (submit(), false)" class="pt-5">
+    <b-form @submit.prevent="submit()" class="pt-5">
       <b-form-group label="入居者名">
         <b-form-input type="text" v-model="tenant.data.name" required />
       </b-form-group>
