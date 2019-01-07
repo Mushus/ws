@@ -70,10 +70,9 @@
 import Vue from 'vue';
 import moment from 'moment';
 import Datepicker from 'vuejs-datepicker';
-import { ja } from 'vuejs-datepicker/dist/locale'
-
-const DateFormatString = 'YYYYMMDD';
-const MaxDate = 99999999;
+import { ja } from 'vuejs-datepicker/dist/locale';
+import { MAX_DATE, DATE_FORMAT } from '@/util/constants';
+import { normalizeArticle, normalizeRoom, normalizeTenant } from '@/util/normalize';
 
 export default Vue.extend({
   components: {
@@ -90,19 +89,13 @@ export default Vue.extend({
       if (!articleDoc.exists) {
         return error({ statusCode: 404, message: '指定された建物は存在しません' });
       }
-      article = {
-        id: articleDoc.id,
-        data: articleDoc.data(),
-      };
+      article = normalizeArticle(articleDoc.id, articleDoc.data());
 
       const roomDoc = await roomsRef.doc(roomId).get();
       if (!roomDoc.exists) {
         return error({ statusCode: 404, message: '指定された部屋は存在しません' });
       }
-      room = {
-        id: roomDoc.id,
-        data: roomDoc.data(),
-      };
+      room = normalizeRoom(roomDoc.id, roomDoc.data());
     } catch(e) {
       console.log(e);
       return error({ statusCode: 500, message: 'データ取得失敗' });
@@ -113,19 +106,16 @@ export default Vue.extend({
       roomId,
       article,
       room,
-      tenant: {
-        id: null,
-        data: {
-          articleId,
-          roomId,
-          name: '',
-          rent: room.data.rent,
-          commonAreaCharge: article.data.commonAreaCharge,
-          parkingFee: article.data.parkingFee,
-          moveInAt: Number(moment().format(DateFormatString)),
-          moveOutAt: MaxDate,
-        }
-      },
+      tenant: normalizeTenant(null, {
+        articleId,
+        roomId,
+        name: '',
+        rent: room.data.rent,
+        commonAreaCharge: article.data.commonAreaCharge,
+        parkingFee: article.data.parkingFee,
+        moveInAt: Number(moment().format(DATE_FORMAT)),
+        moveOutAt: MAX_DATE,
+      }),
       ja,
     };
   },
@@ -133,10 +123,10 @@ export default Vue.extend({
     tenantMoveInAt: {
       get() {
         const moveInAt = this.tenant.data.moveInAt;
-        return moveInAt ? moment(String(moveInAt), DateFormatString).toDate(): null;
+        return moveInAt ? moment(String(moveInAt), DATE_FORMAT).toDate(): null;
       },
       set(v) {
-        this.tenant.data.moveInAt = v? Number(moment(v).format(DateFormatString)) : null;
+        this.tenant.data.moveInAt = v? Number(moment(v).format(DATE_FORMAT)) : null;
       }
     }
   },

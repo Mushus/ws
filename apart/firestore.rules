@@ -11,5 +11,8 @@ service cloud.firestore {
     match /tenants/{tenantID} {
       allow read, write: if request.auth.uid != null;
     }
+    match /receipts/{receiptID} {
+      allow read, write: if request.auth.uid != null;
+    }
   }
 }

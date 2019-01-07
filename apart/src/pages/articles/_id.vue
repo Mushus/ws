@@ -48,11 +48,20 @@
           :key="room.key"
           >
           <b-form-group label="部屋名">
-            <b-form-input type="text" v-model="room.data.name" required />
+            <b-form-input
+              type="text"
+              v-model="room.data.name"
+              required
+              />
           </b-form-group>
           <b-form-group label="家賃">
             <b-input-group append="円 / 月">
-              <b-form-input type="text" v-model="room.data.rent" required />
+              <b-form-input
+                type="number"
+                v-model="room.data.rent"
+                required
+                min="0"
+                />
             </b-input-group>
           </b-form-group>
           <b-button-group>
@@ -70,6 +79,7 @@
 <script>
 import shortid from 'shortid';
 import Vue from 'vue';
+import { normalizeArticle, normalizeRoom } from '@/util/normalize';
 
 export default Vue.extend({
   async asyncData({ params, error, $firestore }) {
@@ -89,10 +99,7 @@ export default Vue.extend({
         return error({ statusCode: 404, message: '指定された物件が存在しません' });
       }
 
-      article = {
-        id: articleId,
-        data: articleDoc.data()
-      };
+      article = normalizeArticle(articleDoc.id, articleDoc.data());
 
       const roomsDoc = await roomsRef
         .where('articleId', '==', articleDoc.id)
@@ -100,8 +107,7 @@ export default Vue.extend({
         .get();
       roomsDoc.forEach(room => rooms.push({
         key: room.id,
-        id: room.id,
-        data: room.data(),
+        ...normalizeRoom(room.id, room.data()),
       }));
 
     } catch(e) {
@@ -120,14 +126,11 @@ export default Vue.extend({
       const lastIndex = this.rooms.length;
       this.rooms.push({
         key: shortid.generate(),
-        id: null,
-        data: {
+        ...normalizeRoom(null, {
           articleId: this.article.id,
-          name: '',
           index: lastIndex,
-          rent: 0,
-        },
-      })
+        }),
+      });
     },
     // 部屋を削除する
     // @param index 削除するインデックス

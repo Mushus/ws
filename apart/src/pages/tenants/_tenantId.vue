@@ -20,10 +20,10 @@
 
 <script>
 import Vue from 'vue';
+import { normalizeTenant } from '@/util/normalize';
 
 export default Vue.extend({
-  async asyncData({ error, params, $firestore }) {
-    const tenantId = params.id;
+  async asyncData({ error, params: { tenantId }, $firestore }) {
     const tenantRef = $firestore.collection('tenants').doc(tenantId);
 
     let tenant;
@@ -34,10 +34,7 @@ export default Vue.extend({
         return error({ statusCode: 404, message: '指定された入居者が存在しません' });
       }
 
-      tenant = {
-        id: tenantId,
-        data: tenantDoc.data(),
-      };
+      tenant = normalizeTenant(tenantId, tenantDoc.data());
     } catch(e) {
       console.log(e);
       return error({ statusCode: 500, message: 'データ取得失敗' });

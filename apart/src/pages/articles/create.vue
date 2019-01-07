@@ -24,21 +24,14 @@
 </template>
 
 <script>
-import Vue from "vue"
+import Vue from 'vue';
+import { normalizeArticle } from '@/util/normalize';
 
 export default Vue.extend({
   data() {
     return {
-      article: {
-        id: null,
-        data: {
-          name: '',
-          administrator: '',
-          commonAreaCharge: 0,
-          parkingFee: 0,
-        },
-      }
-    }
+      article: normalizeArticle(),
+    };
   },
   methods: {
     async submit() {

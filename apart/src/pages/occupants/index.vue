@@ -24,6 +24,7 @@
 
 <script>
 import Vue from 'vue';
+import { normalizeArticle } from '@/util/normalize';
 
 export default Vue.extend({
   async asyncData({ error, $firestore }) {
@@ -32,10 +33,8 @@ export default Vue.extend({
     const articles = [];
     try {
       const articlesDoc = await articlesRef.get();
-      articlesDoc.forEach(article => articles.push({
-        id: article.id,
-        data: article.data()
-      }));
+      articlesDoc.forEach(article =>
+        articles.push(normalizeArticle(article.id, article.data())));
     } catch (e) {
       console.log(e);
       return error({ statusCode: 500, message: 'データ取得失敗' });

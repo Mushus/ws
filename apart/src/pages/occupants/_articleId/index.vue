@@ -72,9 +72,8 @@
 <script>
 import Vue from 'vue';
 import moment from 'moment';
-
-const DateFormatString = 'YYYYMMDD';
-const MaxDate = 99999999;
+import { MAX_DATE, DATE_FORMAT } from '@/util/constants';
+import { normalizeArticle, normalizeRoom, normalizeTenant } from '@/util/normalize';
 
 export default Vue.extend({
   async asyncData({ error, params: { articleId }, $firestore }) {
@@ -94,30 +93,23 @@ export default Vue.extend({
         return error({ statusCode: 404, message: '指定された建物が存在しません' });
       }
 
-      article = {
-        id: articleDoc.id,
-        data: articleDoc.data(),
-      };
+      article = normalizeArticle(articleDoc.id, articleDoc.data());
       await Promise.all([
         (async () => {
           const roomsDoc = await roomsRef
             .where('articleId', '==', articleId)
             .orderBy('index')
             .get();
-          roomsDoc.forEach(room => rooms.push({
-            id: room.id,
-            data: room.data(),
-          }));
+          roomsDoc.forEach(room =>
+            rooms.push(normalizeRoom(room.id, room.data())));
         })(),
         (async () => {
           const tenantsDoc = await tenantsRef
             .where('articleId', '==', articleId)
-            .where('moveOutAt', '>=', Number(moment().format(DateFormatString)))
+            .where('moveOutAt', '>=', Number(moment().format(DATE_FORMAT)))
             .get();
-          tenantsDoc.forEach(tenant => tenants.push({
-            id: tenant.id,
-            data: tenant.data(),
-          }));
+          tenantsDoc.forEach(tenant =>
+            tenants.push(normalizeTenant(tenant.id, tenant.data())));
         })()
       ]);
     } catch (e) {
@@ -126,7 +118,7 @@ export default Vue.extend({
     }
 
     // 日付が今日より小さいデータはテーブルから省略
-    const minDate = Number(moment().format(DateFormatString));
+    const minDate = Number(moment().format(DATE_FORMAT));
 
     return {
       articleId,
@@ -155,7 +147,7 @@ export default Vue.extend({
         available: 0,
         unavailable: 1,
       },
-      maxDate: MaxDate,
+      maxDate: MAX_DATE,
       minDate,
     };
   },
@@ -175,7 +167,7 @@ export default Vue.extend({
   },
   methods: {
     numberToDate(num) {
-      return num ? moment(String(num), DateFormatString).format('YYYY年MM月DD日'): null;
+      return num ? moment(String(num), DATE_FORMAT).format('YYYY年MM月DD日'): null;
     }
   },
 })

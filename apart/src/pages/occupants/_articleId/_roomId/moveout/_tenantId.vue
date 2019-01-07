@@ -22,7 +22,7 @@
       <b-form-input type="text" v-model="tenant.data.name" readonly />
     </b-form-group>
     <b-form-group label="入居日">
-      <b-form-input type="text" :value="tenant.moveOutAt" readonly />
+      <b-form-input type="text" v-model="tenantMoveInAt" readonly />
     </b-form-group>
     <b-form @submit.prevent="submit()" class="pt-5">
       <b-form-group label="退去日">
@@ -44,10 +44,9 @@
 import Vue from 'vue';
 import moment from 'moment';
 import Datepicker from 'vuejs-datepicker';
-import { ja } from 'vuejs-datepicker/dist/locale'
-
-const DateFormatString = 'YYYYMMDD';
-const MaxDate = 99999999;
+import { ja } from 'vuejs-datepicker/dist/locale';
+import { DATE_FORMAT } from '@/util/constants';
+import { normalizeArticle, normalizeRoom, normalizeTenant } from '@/util/normalize';
 
 export default Vue.extend({
   components: {
@@ -66,34 +65,22 @@ export default Vue.extend({
       if (!articleDoc.exists) {
         return error({ statusCode: 404, message: '指定された建物は存在しません' });
       }
-      article = {
-        id: articleDoc.id,
-        data: articleDoc.data(),
-      };
+      article = normalizeArticle(articleDoc.id, articleDoc.data());
 
       const roomDoc = await roomsRef.doc(roomId).get();
       if (!roomDoc.exists) {
         return error({ statusCode: 404, message: '指定された部屋は存在しません' });
       }
-      room = {
-        id: roomDoc.id,
-        data: roomDoc.data(),
-      };
+      room = normalizeRoom(roomDoc.id, roomDoc.data());
 
       const tenantDoc = await tenantsRef.doc(tenantId).get();
       if (!tenantDoc.exists) {
         return error({ statusCode: 404, message: '指定された入居者は存在しません' });
       }
-      const tenantData = tenantDoc.data();
-      tenant = {
-        id: tenantDoc.id,
-        moveOutAt: moment(tenantData.moveInAt).format('YYYY年MM月DD'),
-        data: {
-          ...tenantData,
-          // 退去日をデフォルト値として今日に設定する
-          moveOutAt: Number(moment().format(DateFormatString)),
-        }
-      }
+      tenant = normalizeTenant(tenantDoc.id, {
+        ...tenantDoc.data(),
+        moveOutAt: Number(moment().format(DATE_FORMAT)),
+      });
     } catch(e) {
       console.log(e);
       return error({ statusCode: 500, message: 'データ取得失敗' });
@@ -109,13 +96,19 @@ export default Vue.extend({
     };
   },
   computed: {
+    tenantMoveInAt: {
+      get() {
+        return moment(this.tenant.data.moveInAt).format('YYYY年MM月DD');
+      },
+      set() {},
+    },
     tenantMoveOutAt: {
       get() {
         const moveOutAt = this.tenant.data.moveOutAt;
-        return moveOutAt ? moment(String(moveOutAt), DateFormatString).toDate(): null;
+        return moveOutAt ? moment(String(moveOutAt), DATE_FORMAT).toDate(): null;
       },
       set(v) {
-        this.tenant.data.moveOutAt = v? Number(moment(v).format(DateFormatString)) : null;
+        this.tenant.data.moveOutAt = v? Number(moment(v).format(DATE_FORMAT)) : null;
       }
     }
   },

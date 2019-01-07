@@ -8,7 +8,7 @@
     </b-navbar>
     <b-table :fixed="true" :fields="fields" :items="items">
       <template slot="control" slot-scope="data">
-        <b-button :to="{ name: 'tenants-id', params: { id: data.item.id } }">編集する</b-button>
+        <b-button :to="{ name: 'tenants-tenantId', params: { id: data.item.id } }">編集する</b-button>
       </template>
     </b-table>
   </section>
@@ -16,6 +16,7 @@
 
 <script>
 import Vue from "vue";
+import { normalizeArticle, normalizeRoom, normalizeTenant, normalizeReceipt } from '@/util/normalize';
 
 export default Vue.extend({
   async asyncData({ error, $firestore }) {
@@ -23,10 +24,8 @@ export default Vue.extend({
     const tenants = [];
     try {
       const tenantsDoc = await tenantsRef.get();
-      tenantsDoc.forEach(tenant => tenants.push({
-        id: tenant.id,
-        data: tenant.data(),
-      }));
+      tenantsDoc.forEach(tenant =>
+        tenants.push(normalizeTenant(tenant.id, tenant.data())));
     } catch(e) {
       console.log(e);
       return error({ statusCode: 500, message: 'データ取得失敗' });

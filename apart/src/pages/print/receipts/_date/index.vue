@@ -47,6 +47,7 @@
 
 <script>
 import Vue from "vue";
+import { normalizeArticle, normalizeRoom, normalizeTenant } from '@/util/normalize';
 
 export default Vue.extend({
   async asyncData({ error, $firestore, params: { date } }) {
@@ -62,17 +63,13 @@ export default Vue.extend({
       await Promise.all([
         (async () => {
           const articlesDoc = await articlesRef.get();
-          articlesDoc.forEach(article => articles.push({
-            id: article.id,
-            data: article.data(),
-          }));
+          articlesDoc.forEach(article =>
+            articles.push(normalizeArticle(article.id, article.data())));
         })(),
         (async () => {
           const roomsDoc = await roomsRef.get();
-          roomsDoc.forEach(room => rooms.push({
-            id: room.id,
-            data: room.data(),
-          }));
+          roomsDoc.forEach(room =>
+            rooms.push(normalizeRoom(room.id, room.data())));
         })(),
         (async () => {
           // 指定月に入居中の部屋の一覧
@@ -81,10 +78,8 @@ export default Vue.extend({
             //.where('moveInAt', '<', numYearMonth * 100 + 99)
             .where('moveOutAt', '>', numDate * 100)
             .get();
-          tenantDoc.forEach(tenant => tenants.push({
-            id: tenant.id,
-            data: tenant.data(),
-          }));
+          tenantDoc.forEach(tenant =>
+            tenants.push(normalizeTenant(tenant.id, tenant.data())));
           // 複数のフィールドに不等式が使えないので
           tenants = tenants.filter(tenant => tenant.data.moveInAt < numDate * 100 + 99)
         })()

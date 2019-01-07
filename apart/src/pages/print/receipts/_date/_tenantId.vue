@@ -81,27 +81,72 @@ import { ja } from 'vuejs-datepicker/dist/locale';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { html, template } from '@/util/print/receipt';
-const DateFormatString = 'YYYYMMDD';
+import { normalizeTenant, normalizeArticle, normalizeReceipt } from '@/util/normalize';
+import { DATE_FORMAT } from '@/util/constants';
 
 export default Vue.extend({
   components: {
     Datepicker,
   },
-  async asyncData({ error, params: { date } }) {
-    return {
-      receipt: {
-        id: null,
-        data: {
-          publishAt: 20180101,
-          tenantName: '入居者名',
-          rent: 10000,
-          commonAreaCharge: 3000,
-          parkingFee: 1000,
-          waterCharge: 1500,
-          administrator: '管理者名',
-        },
-      },
+  async asyncData({ error, params: { tenantId, date }, $firestore }) {
+    const receiptsRef = $firestore.collection('receipts');
+    const tenantsRef = $firestore.collection('tenants');
+    const articlesRef = $firestore.collection('articles');
+
+    const result = {
       ja,
+    };
+    let receipt;
+    try {
+      const receipts = await receiptsRef
+        .where('tenantId', '==', tenantId)
+        .get();
+
+      // 過去に印刷した領収書が存在してたらそれを復元する
+      if (receipts.size > 0) {
+        // 複数ある可能性はあるが基本的に1つ
+        const receipt = receipts.docs[0];
+        return {
+          ...result,
+          receipt: normalizeReceipt(receipt.id, receipt.data()),
+        };
+      }
+
+      const tenantDoc = await tenantsRef
+        .doc(tenantId)
+        .get();
+
+      if (!tenantDoc.exists) {
+        return error({ statusCode: 404, message: '指定された入居者は存在しません' });
+      }
+
+      const tenant = normalizeTenant(tenantDoc.id, tenantDoc.data());
+
+      const articleDoc = await articlesRef
+        .doc(tenant.data.articleId)
+        .get();
+
+      if (!articleDoc.exists) {
+        return error({ statusCode: 404, message: '指定された建物は存在しません' });
+      }
+
+      const article = normalizeArticle(articleDoc.id, articleDoc.data());
+
+      return {
+        ...result,
+        receipt: normalizeReceipt(null, {
+          publishAt: Number(moment().format(DATE_FORMAT)),
+          tenantName: tenant.data.name,
+          rent: tenant.data.rent,
+          commonAreaCharge: tenant.data.commonAreaCharge,
+          parkingFee: tenant.data.parkingFee,
+          waterCharge: 0,
+          administrator: article.data.administrator,
+        }),
+      };
+    } catch (e) {
+      console.log(e);
+      return error({ statusCode: 500, message: 'データ取得失敗' });
     }
   },
   mounted() {
@@ -112,10 +157,10 @@ export default Vue.extend({
     receiptPublishAt: {
       get() {
         const publishAt = this.receipt.data.publishAt;
-        return publishAt ? moment(String(publishAt), DateFormatString).toDate(): null;
+        return publishAt ? moment(String(publishAt), DATE_FORMAT).toDate(): null;
       },
       set(v) {
-        this.receipt.data.publishAt = v? Number(moment(v).format(DateFormatString)) : null;
+        this.receipt.data.publishAt = v? Number(moment(v).format(DATE_FORMAT)) : null;
       }
     }
   },
