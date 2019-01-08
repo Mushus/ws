@@ -1,0 +1,9 @@
+version: '3'
+services:
+  build:
+    image: node:11
+    volumes:
+      - /d/dev/ws/apart:/workspace
+      - /workspace/node_modules
+    command: bash -c 'yarn && yarn generate'
+    working_dir: /workspace
