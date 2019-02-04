@@ -1,0 +1,28 @@
+app:
+  port: 80
+
+services:
+  /:
+    static: /var/www
+  /api:
+    proxy: http://localhost:8081/api
+    security: anonymous
+
+middlewares:
+  security:
+    anonymous:
+      default: yes
+      authorization: no
+      cors:
+        domains:
+          - localhost
+          - 127.0.0.1
+    enduser:
+      authorization: yes
+      cors: no
+    admin:
+      authorization: yes
+      cors: no
+    api:
+      authorization: yes
+      cors: no
