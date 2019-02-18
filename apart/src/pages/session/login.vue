@@ -1,20 +1,26 @@
 <template>
   <section>
-    <h2>ログイン</h2>
-    <section>
-      <div class="message-error" v-if="error !== ''">
-        {{ error }}
-      </div>
-      <form @submit.prevent="login($event)">
-        <dl>
-          <dt><label for="email">メールアドレス</label></dt>
-          <dd><input type="email" id="email" v-model="email"></dd>
-          <dt><label for="password">パスワード</label></dt>
-          <dd><input type="password" id="password" v-model="password"></dd>
-        </dl>
-        <button type="submit" :disabled="isProcessing">ログイン</button>
-      </form>
-    </section>
+    <b-container>
+      <b-row class="justify-content-sm-center">
+        <b-col sm="5">
+          <h2>ログイン</h2>
+          <div class="message-error" v-if="error !== ''">
+            {{ error }}
+          </div>
+          <b-form @submit.prevent="login($event)">
+            <b-form-group label="メールアドレス">
+              <b-input type="text" v-model="email" required />
+            </b-form-group>
+            <b-form-group label="メールアドレス">
+              <b-input type="password" v-model="password" required />
+            </b-form-group>
+            <b-button-group>
+              <b-button variant="primary" type="submit" :disabled="isProcessing">ログイン</b-button>
+            </b-button-group>
+          </b-form>
+        </b-col>
+      </b-row>
+    </b-container>
   </section>
 </template>
 

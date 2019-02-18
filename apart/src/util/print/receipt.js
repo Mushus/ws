@@ -152,7 +152,11 @@ export function template({
   commonAreaCharge,
   publishAt
 }) {
-  const sum = rent + waterCharge + parkingFee + commonAreaCharge;
+  const sum =
+    Number(rent) +
+    Number(waterCharge) +
+    Number(parkingFee) +
+    Number(commonAreaCharge);
   const receipt = `
   <div class="tenantName" style="grid-area: tenantName;">${tenantName} 様</div>
   <div class="publishAt" style="grid-area: publishAt;">
@@ -171,25 +175,25 @@ export function template({
     <tbody>
       <tr>
         <td>家賃</td>
-        <td class="charge">${rent.toLocaleString()} 円</td>
+        <td class="charge">${(+rent).toLocaleString()} 円</td>
       </tr>
       <tr>
         <td>水道料金</td>
-        <td class="charge">${waterCharge.toLocaleString()} 円</td>
+        <td class="charge">${(+waterCharge).toLocaleString()} 円</td>
       </tr>
       <tr>
         <td>駐車場料金</td>
-        <td class="charge">${parkingFee.toLocaleString()} 円</td>
+        <td class="charge">${(+parkingFee).toLocaleString()} 円</td>
       </tr>
       <tr>
         <td>共益費</td>
-        <td class="charge">${commonAreaCharge.toLocaleString()} 円</td>
+        <td class="charge">${(+commonAreaCharge).toLocaleString()} 円</td>
       </tr>
     </tbody>
     <tfoot>
       <tr>
         <td>計</td>
-        <td class="charge">${sum.toLocaleString()} 円</td>
+        <td class="charge">${(+sum).toLocaleString()} 円</td>
       </tr>
     </tfoot>
   </table>

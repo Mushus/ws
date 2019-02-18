@@ -27,12 +27,14 @@
         />
     </b-form-group>
     <b-form-group label="家賃">
-      <b-form-input
-        type="number"
-        v-model="receipt.data.rent"
-        required
-        min="0"
-        />
+      <b-input-group append="円">
+        <b-form-input
+          type="number"
+          v-model="receipt.data.rent"
+          required
+          min="0"
+          />
+      </b-input-group>
     </b-form-group>
     <b-form-group label="共益費">
       <b-input-group append="円">
@@ -150,7 +152,8 @@ export default Vue.extend({
     }
   },
   mounted() {
-    this.$refs.printfield.contentWindow.document.write(html);
+    const win = this.$refs.printfield.contentWindow;
+    win.document.write(html);
     this.updatePreview();
   },
   computed: {
@@ -164,6 +167,14 @@ export default Vue.extend({
       }
     }
   },
+  watch: {
+    receipt: {
+      handler() {
+        this.updatePreview();
+      },
+      deep: true,
+    }
+  },
   methods: {
     updatePreview() {
       const iframeElement = this.$refs.printfield;
@@ -175,7 +186,35 @@ export default Vue.extend({
       iframeElement.style.height = `${Math.ceil(iframeHtmlElem.scrollHeight)}px`;
     },
     print() {
-      this.$refs.printfield.contentWindow.print();
+      const win = window.open();
+      win.document.write(html);
+      win.document.close();
+      // NOTE: iframe を印刷しようとすると chrome が印刷ダイアログを表示してくれない
+      setTimeout(() => {
+        win.document.body.innerHTML = template(this.receipt.data);
+        win.print();
+      });
+    },
+    async submit() {
+      const receiptsRef = this.$firestore.collection('receipts');
+      try {
+        if (this.receipt.id) {
+          const receiptId = this.receipt.id;
+          const receipt = receiptsRef.doc(receiptId);
+          await receipt.update(this.receipt.data);
+        } else {
+          const receipt = await receiptsRef.add(this.receipt.data);
+        }
+        const date = this.$router.params.date;
+        this.$router.push({
+          name: 'receipts-date',
+          params: {
+            date,
+          },
+        });
+      } catch(e) {
+        console.log(e);
+      }
     }
   }
 })
