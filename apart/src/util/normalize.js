@@ -50,7 +50,9 @@ export function normalizeReceipt(id = null, data = {}) {
       commonAreaCharge: Number(data.commonAreaCharge || 0),
       parkingFee: Number(data.parkingFee || 0),
       waterCharge: Number(data.waterCharge || 0),
-      administrator: String(data.administrator || '')
+      administrator: String(data.administrator || ''),
+      tenantId: String(data.tenantId),
+      date: String(data.date)
     }
   };
 }

@@ -144,6 +144,8 @@ export default Vue.extend({
           parkingFee: tenant.data.parkingFee,
           waterCharge: 0,
           administrator: article.data.administrator,
+          tenantId: tenant.id,
+          date,
         }),
       };
     } catch (e) {
@@ -194,6 +196,8 @@ export default Vue.extend({
         win.document.body.innerHTML = template(this.receipt.data);
         win.print();
       });
+
+      this.submit();
     },
     async submit() {
       const receiptsRef = this.$firestore.collection('receipts');
@@ -205,9 +209,9 @@ export default Vue.extend({
         } else {
           const receipt = await receiptsRef.add(this.receipt.data);
         }
-        const date = this.$router.params.date;
+        const date = this.$route.params.date;
         this.$router.push({
-          name: 'receipts-date',
+          name: 'print-receipts-date',
           params: {
             date,
           },

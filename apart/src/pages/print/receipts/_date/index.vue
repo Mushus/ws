@@ -27,6 +27,14 @@
             空室
           </b-badge>
         </template>
+        <template slot="receipt" slot-scope="data">
+          <b-badge v-if="data.item.receipt != null" variant="primary">
+            印刷済み
+          </b-badge>
+          <b-badge v-else>
+            未印刷
+          </b-badge>
+        </template>
         <template slot="control" slot-scope="data">
           <template v-if="data.item.tenantId != null">
             <b-button
@@ -47,7 +55,7 @@
 
 <script>
 import Vue from "vue";
-import { normalizeArticle, normalizeRoom, normalizeTenant } from '@/util/normalize';
+import { normalizeArticle, normalizeRoom, normalizeTenant, normalizeReceipt } from '@/util/normalize';
 
 export default Vue.extend({
   async asyncData({ error, $firestore, params: { date } }) {
@@ -55,10 +63,12 @@ export default Vue.extend({
     const numDate = Number(date);
     const articlesRef = $firestore.collection('articles');
     const roomsRef = $firestore.collection('rooms');
-    const tenantRef = $firestore.collection('tenants');
+    const tenantsRef = $firestore.collection('tenants');
+    const receiptRef = $firestore.collection('receipts');
     const articles = [];
     const rooms = [];
     let tenants = [];
+    let receipts = [];
     try {
       await Promise.all([
         (async () => {
@@ -73,15 +83,27 @@ export default Vue.extend({
         })(),
         (async () => {
           // 指定月に入居中の部屋の一覧
-          const tenantDoc = await tenantRef
+          const tenantDoc = await tenantsRef
             // NOTE: 複数のフィールドに不等式は使用できない
             //.where('moveInAt', '<', numYearMonth * 100 + 99)
             .where('moveOutAt', '>', numDate * 100)
             .get();
-          tenantDoc.forEach(tenant =>
-            tenants.push(normalizeTenant(tenant.id, tenant.data())));
+          tenantDoc.forEach(tenant => {
+            const tenantData = tenant.data();
+            if (tenantData.moveInAt < numDate * 100 + 99) {
+              tenants.push(normalizeTenant(tenant.id, tenantData));
+            }
+          });
           // 複数のフィールドに不等式が使えないので
           tenants = tenants.filter(tenant => tenant.data.moveInAt < numDate * 100 + 99)
+        })(),
+        (async () => {
+          const receiptDoc = await receiptRef
+            .where('date', '==', date)
+            .get();
+          receiptDoc.forEach(receipt => {
+            receipts.push(normalizeReceipt(receipt.id, receipt.data()));
+          });
         })()
       ]);
     } catch(e) {
@@ -94,6 +116,7 @@ export default Vue.extend({
       articles,
       rooms,
       tenants,
+      receipts,
       fields: [
         {
           key: 'name',
@@ -104,10 +127,15 @@ export default Vue.extend({
           label: '入居者',
         },
         {
+          key: 'receipt',
+          label: '領収書',
+          class: 'w-25',
+        },
+        {
           key: 'control',
           label: '操作',
-          class: 'w-25'
-        }
+          class: 'w-25',
+        },
       ],
     };
   },
@@ -137,19 +165,24 @@ export default Vue.extend({
         .filter(room => room.data.articleId === articleId)
         .forEach(room => {
           const tenants = this.tenants
-            .filter(tenant => tenant.data.roomId == room.id)
-          tenants.forEach(tenant => rooms.push({
-            id: room.id,
-            name: room.data.name,
-            tenantName: tenant.data.name,
-            tenantId: tenant.id,
-          }));
+            .filter(tenant => tenant.data.roomId === room.id)
+          tenants.forEach(tenant => {
+            const receipt = this.receipts.find(receipt => receipt.data.tenantId === tenant.id) || null;
+            rooms.push({
+              id: room.id,
+              name: room.data.name,
+              tenantName: tenant.data.name,
+              tenantId: tenant.id,
+              receipt,
+            });
+          });
           if (tenants.length === 0) {
             rooms.push({
               id: room.id,
               name: room.data.name,
               tenantName: null,
               tenantId: null,
+              receipt: null,
             });
           }
         });
