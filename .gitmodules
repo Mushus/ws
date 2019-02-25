@@ -10,3 +10,6 @@
 [submodule "presentations"]
 	path = presentations
 	url = git@github.com:Mushus/presentations.git
+[submodule "apart"]
+	path = apart
+	url = git@github.com:Mushus/apart.git
