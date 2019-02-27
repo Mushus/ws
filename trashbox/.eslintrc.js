@@ -30,7 +30,8 @@ module.exports = {
   },
   'rules': {
      /* @typescript-eslint/no-unused-vars */
-    'no-unused-vars': 'off'
+    'no-unused-vars': 'off',
+    'no-console': 'off'
   },
   'settings': {
     'react': {
@@ -39,6 +40,7 @@ module.exports = {
   },
   'globals': {
     'window': true,
-    'document': true
+    'document': true,
+    'console': true,
   }
 };
