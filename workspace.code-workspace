@@ -10,16 +10,10 @@
 			"path": "til"
 		},
 		{
-			"path": "apart"
-		},
-		{
 			"path": "app"
 		},
 		{
 			"path": "toolbox"
-		},
-		{
-			"path": "apartment"
 		},
 		{
 			"path": "tw"
@@ -32,6 +26,12 @@
 		},
 		{
 			"path": "presentations"
+		},
+		{
+			"path": "apart"
+		},
+		{
+			"path": "trashbox"
 		}
 	],
 	"settings": {}
