@@ -9,6 +9,7 @@ require (
 	github.com/labstack/echo/v4 v4.0.0-20190302184323-775b2eefec49
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/pkg/errors v0.8.1 // indirect
+	golang.org/x/crypto v0.0.0-20190130090550-b01c7a725664
 	golang.org/x/net v0.0.0-20190301231341-16b79f2e4e95 // indirect
 	golang.org/x/xerrors v0.0.0-20190212162355-a5947ffaace3
 )
