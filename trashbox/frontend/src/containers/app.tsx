@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Wysiwyg from '~/components/Wysiwyg';
+import Editor from '~/components/Editor';
 
 interface StateProps {}
 
@@ -9,7 +9,7 @@ type Props = StateProps & ActionProps;
 
 const App = () => (
 	<React.Fragment>
-		<Wysiwyg />
+		<Editor />
 	</React.Fragment>
 );
 
