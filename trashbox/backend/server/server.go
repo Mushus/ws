@@ -1,16 +1,24 @@
 package server
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 // Server サーバーインスタンスです
 type Server struct {
 	router *echo.Echo
 	db     *DB
+}
+
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+// Validate バリデーションをする
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
 }
 
 // New サーバーを作成する
@@ -45,6 +53,7 @@ func createRouter() *echo.Echo {
 
 	e.HideBanner = true
 	e.HidePort = true
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	e.Use(middleware.Logger(), middleware.Recover())
 
@@ -53,53 +62,4 @@ func createRouter() *echo.Echo {
 	e.GET("/logout", logout)
 
 	return e
-}
-
-func loginPage(c echo.Context) error {
-	return c.HTML(http.StatusOK, `<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Login</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-</head>
-<body>
-<form method="POST" action="login">
-<input type="text" name="user" placeholder="user name">
-<input type="text" name="password" placeholder="passowrd">
-<button type="submit">Login</button>
-</form>
-</body>
-</html>`)
-}
-
-func login(c echo.Context) error {
-	return c.HTML(http.StatusOK, `<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Login</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-</head>
-<body>
-<form method="POST" action="login">
-<input type="text" name="user" placeholder="user name">
-<input type="text" name="password" placeholder="passowrd">
-<button type="submit">Login</button>
-</form>
-</body>
-</html>`)
-}
-
-func logout(c echo.Context) error {
-	return c.HTML(http.StatusOK, `<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Login</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-</head>
-ログアウトしました。
-</body>
-</html>`)
 }
