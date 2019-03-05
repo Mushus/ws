@@ -35,26 +35,15 @@ func login(c echo.Context) error {
 	if err := c.Bind(&prm); err != nil {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
+
+	vr := ValidationResult{}
 	if err := c.Validate(prm); err != nil {
-		ReportValidation(err)
-		//return err
+		vr = ReportValidation(err)
 	}
 
-	return c.HTML(http.StatusOK, `<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Login</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-</head>
-<body>
-<form method="POST" action="login">
-<input type="text" name="user" placeholder="user name">
-<input type="text" name="password" placeholder="passowrd">
-<button type="submit">Login</button>
-</form>
-</body>
-</html>`)
+	return c.Render(http.StatusOK, "login", LoginView{
+		Errors: vr,
+	})
 }
 
 func logout(c echo.Context) error {

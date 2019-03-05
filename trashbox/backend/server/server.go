@@ -44,6 +44,7 @@ func createRouter() *echo.Echo {
 	e.HideBanner = true
 	e.HidePort = true
 	e.Validator = NewValidator()
+	e.Renderer = NewRenderer()
 
 	e.Use(middleware.Logger(), middleware.Recover())
 
