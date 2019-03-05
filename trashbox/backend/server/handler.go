@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	validator "gopkg.in/go-playground/validator.v9"
 )
 
 func loginPage(c echo.Context) error {
@@ -69,18 +68,4 @@ func logout(c echo.Context) error {
 ログアウトしました。
 </body>
 </html>`)
-}
-
-// ReportValidation バリデーション結果を分解します
-func ReportValidation(errs error) map[string][]string {
-	result := map[string][]string{}
-	for _, err := range errs.(validator.ValidationErrors) {
-		key := err.Field()
-		if v, ok := result[key]; ok {
-			result[key] = append(v, err.Tag())
-		} else {
-			result[key] = []string{err.Tag()}
-		}
-	}
-	return result
 }

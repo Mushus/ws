@@ -3,22 +3,12 @@ package server
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	validator "gopkg.in/go-playground/validator.v9"
 )
 
 // Server サーバーインスタンスです
 type Server struct {
 	router *echo.Echo
 	db     *DB
-}
-
-type CustomValidator struct {
-	validator *validator.Validate
-}
-
-// Validate バリデーションをする
-func (cv *CustomValidator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
 }
 
 // New サーバーを作成する
@@ -53,7 +43,7 @@ func createRouter() *echo.Echo {
 
 	e.HideBanner = true
 	e.HidePort = true
-	e.Validator = &CustomValidator{validator: validator.New()}
+	e.Validator = NewValidator()
 
 	e.Use(middleware.Logger(), middleware.Recover())
 
