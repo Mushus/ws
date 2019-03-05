@@ -2,27 +2,23 @@ package server
 
 import (
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/jmoiron/sqlx"
-
-	"golang.org/x/xerrors"
 )
 
 // Server サーバーインスタンスです
 type Server struct {
 	router *echo.Echo
-	db *sqlx.DB
+	db     *DB
 }
 
 // New サーバーを作成する
 func New() (*Server, error) {
 
 	r := createRouter()
-	db, err := createDatabase()
+
+	db, err := NewDB("trashbox.db")
 	if err != nil {
 		r.Logger.Fatal(err)
 		return nil, err
@@ -30,7 +26,7 @@ func New() (*Server, error) {
 
 	return &Server{
 		router: r,
-		db: db,
+		db:     db,
 	}, nil
 }
 
@@ -46,29 +42,20 @@ func (s Server) Start() {
 
 func createRouter() *echo.Echo {
 	e := echo.New()
+
 	e.HideBanner = true
 	e.HidePort = true
+
 	e.Use(middleware.Logger(), middleware.Recover())
-	e.GET("/login", getLogin)
+
+	e.GET("/login", loginPage)
+	e.POST("/login", login)
+	e.GET("/logout", logout)
+
 	return e
 }
 
-func createDatabase() (*sqlx.DB, error) {
-	workspace, err := os.Getwd()
-	if err != nil {
-		return nil, xerrors.Errorf("failed to get current directory: %w", err)
-	}
-	// データベースの保存先
-	dbPath := filepath.Join(workspace, "trashbox.db")
-
-	db, err := sqlx.Open("sqlite3", dbPath)
-	if err != nil {
-		return nil, xerrors.Errorf("failed to open database: %w", err)
-	}
-	return db, nil
-}
-
-func getLogin(c echo.Context) error {
+func loginPage(c echo.Context) error {
 	return c.HTML(http.StatusOK, `<!doctype html>
 <html>
 <head>
@@ -86,7 +73,7 @@ func getLogin(c echo.Context) error {
 </html>`)
 }
 
-func postLogin(c echo.Context) error {
+func login(c echo.Context) error {
 	return c.HTML(http.StatusOK, `<!doctype html>
 <html>
 <head>
@@ -100,6 +87,19 @@ func postLogin(c echo.Context) error {
 <input type="text" name="password" placeholder="passowrd">
 <button type="submit">Login</button>
 </form>
+</body>
+</html>`)
+}
+
+func logout(c echo.Context) error {
+	return c.HTML(http.StatusOK, `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Login</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+ログアウトしました。
 </body>
 </html>`)
 }
