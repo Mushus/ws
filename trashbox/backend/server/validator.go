@@ -37,13 +37,13 @@ type ValidationFiledResult []string
 
 // FieldLabels バリデーションした結果の名前
 var FieldLabels = map[FieldKey]string{
-	"login":    "ログイン名",
-	"password": "パスワード",
+	"Login":    "ログイン名",
+	"Password": "パスワード",
 }
 
 // ValidationLabels バリデーションのラベル
 var ValidationLabels = map[ValidationType]string{
-	"required": "%s は必須です",
+	"required": "%s を入力してください",
 }
 
 // ReportValidation バリデーション結果を分解します
