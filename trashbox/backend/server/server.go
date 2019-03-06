@@ -20,7 +20,9 @@ func New() (*Server, error) {
 		return nil, err
 	}
 
-	handler := NewHandler(db)
+	docs := NewDocRepo()
+
+	handler := NewHandler(db, docs)
 
 	r, err := createRouter(handler)
 	if err != nil {
@@ -66,6 +68,8 @@ func createRouter(handler Handler) (*echo.Echo, error) {
 	e.GET("/login", handler.GetLogin)
 	e.POST("/login", handler.PostLogin)
 	e.GET("/logout", handler.GetLogout)
+	e.GET("/", handler.GetIndex)
+	e.GET("/:name", handler.GetDoc)
 
 	return e, nil
 }

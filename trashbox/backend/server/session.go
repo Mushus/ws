@@ -12,7 +12,7 @@ import (
 const SessionMaxAge = 60 * 60 * 24 * 100
 
 // SessionKeyUserId is used to obtain user ID from the session
-const SessionKeyUserId = "userId"
+const SessionKeyUserID = "userId"
 
 // NewSession is coreate in-memory session
 func NewSession() (echo.MiddlewareFunc, error) {

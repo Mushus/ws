@@ -10,13 +10,15 @@ import (
 
 // Handler handler
 type Handler struct {
-	db *DB
+	db   *DB
+	docs *DocRepo
 }
 
 // NewHandler ハンドラを生成する
-func NewHandler(db *DB) Handler {
+func NewHandler(db *DB, docs *DocRepo) Handler {
 	return Handler{
-		db: db,
+		db:   db,
+		docs: docs,
 	}
 }
 
@@ -61,7 +63,7 @@ func (h Handler) PostLogin(c echo.Context) error {
 			MaxAge:   SessionMaxAge,
 			HttpOnly: true,
 		}
-		sess.Values[SessionKeyUserId] = user.ID
+		sess.Values[SessionKeyUserID] = user.ID
 		sess.Save(c.Request(), c.Response())
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
@@ -71,7 +73,27 @@ func (h Handler) PostLogin(c echo.Context) error {
 	})
 }
 
-// GetLogout ログアウト処理
+// GetLogout is a handler to logout users
 func (h Handler) GetLogout(c echo.Context) error {
+	// TODO: logout process
 	return c.Render(http.StatusOK, TmplLogout, nil)
+}
+
+// GetIndex is a handler show index of webpage
+func (h Handler) GetIndex(c echo.Context) error {
+	return c.String(http.StatusOK, "it's works!")
+}
+
+// GetDoc is a handler of get document
+func (h Handler) GetDoc(c echo.Context) error {
+	name := c.Param("name")
+
+	doc, err := h.docs.Get(name)
+	if err == DocumentNotFound {
+		return c.String(http.StatusNotFound, "404 document not found")
+	}
+	if err != nil {
+		return err
+	}
+	return c.String(http.StatusOK, doc.Body)
 }
