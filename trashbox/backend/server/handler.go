@@ -3,25 +3,28 @@ package server
 import (
 	"net/http"
 
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
-func loginPage(c echo.Context) error {
-	return c.HTML(http.StatusOK, `<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Login</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-</head>
-<body>
-<form method="POST" action="login">
-<input type="text" name="user" placeholder="user name">
-<input type="text" name="password" placeholder="passowrd">
-<button type="submit">Login</button>
-</form>
-</body>
-</html>`)
+// Handler handler
+type Handler struct {
+	db *DB
+}
+
+// NewHandler ハンドラを生成する
+func NewHandler(db *DB) Handler {
+	return Handler{
+		db: db,
+	}
+}
+
+// GetLogin ログインページ
+func (h Handler) GetLogin(c echo.Context) error {
+	return c.Render(http.StatusOK, TmplLogin, LoginView{
+		Errors: ValidationResult{},
+	})
 }
 
 // LoginParam ログイン
@@ -30,31 +33,45 @@ type LoginParam struct {
 	Password string `validate:"required"`
 }
 
-func login(c echo.Context) error {
+// PostLogin ログイン処理
+func (h Handler) PostLogin(c echo.Context) error {
 	var prm LoginParam
 	if err := c.Bind(&prm); err != nil {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 
-	vr := ValidationResult{}
+	errors := ValidationResult{}
 	if err := c.Validate(prm); err != nil {
-		vr = ReportValidation(err)
+		errors = ReportValidation(err)
 	}
 
-	return c.Render(http.StatusOK, "login", LoginView{
-		Errors: vr,
+	user, ok, err := h.db.VerifyUser(prm.Login, prm.Password)
+	if err != nil {
+		return err
+	}
+
+	// success login
+	if ok {
+		sess, err := session.Get("session", c)
+		if err != nil {
+			return err
+		}
+		sess.Options = &sessions.Options{
+			Path:     "/",
+			MaxAge:   SessionMaxAge,
+			HttpOnly: true,
+		}
+		sess.Values[SessionKeyUserId] = user.ID
+		sess.Save(c.Request(), c.Response())
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+	}
+
+	return c.Render(http.StatusOK, TmplLogin, LoginView{
+		Errors: errors,
 	})
 }
 
-func logout(c echo.Context) error {
-	return c.HTML(http.StatusOK, `<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Login</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-</head>
-ログアウトしました。
-</body>
-</html>`)
+// GetLogout ログアウト処理
+func (h Handler) GetLogout(c echo.Context) error {
+	return c.Render(http.StatusOK, TmplLogout, nil)
 }

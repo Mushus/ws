@@ -46,7 +46,7 @@ func TestVerifyUser(t *testing.T) {
 	}
 
 	for _, row := range table {
-		ok, err := db.VerifyUser(row.in.login, row.in.password)
+		_, ok, err := db.VerifyUser(row.in.login, row.in.password)
 		if err != nil {
 			t.Fatalf("%v", err)
 		}

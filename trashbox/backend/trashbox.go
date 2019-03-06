@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/Mushus/trashbox/backend/server"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -8,7 +10,8 @@ import (
 func main() {
 	s, err := server.New()
 	if err != nil {
-		return
+		log.Fatalf("failed to initialize app: %v", err)
 	}
+
 	s.Start()
 }

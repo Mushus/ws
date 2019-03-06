@@ -8,8 +8,14 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// TemplateMap 複数のテンプレートをまとめたもの
-type TemplateMap map[string]*template.Template
+type (
+	// TemplateMap 複数のテンプレートをまとめたもの
+	TemplateMap map[string]*template.Template
+	// Renderer テンプレートエンジン
+	Renderer struct {
+		templates TemplateMap
+	}
+)
 
 // ExecuteTemplate テンプレートを実行する
 func (t TemplateMap) ExecuteTemplate(w io.Writer, name string, data interface{}) error {
@@ -19,23 +25,15 @@ func (t TemplateMap) ExecuteTemplate(w io.Writer, name string, data interface{})
 	return xerrors.Errorf("template %v is not found", name)
 }
 
-// Renderer テンプレートエンジン
-type Renderer struct {
-	templates TemplateMap
-}
-
 // NewRenderer 新しいテンプレートを作成する
 func NewRenderer() *Renderer {
-	templates := TemplateMap{
-		"login": composeTemplate(layoutTmpl, loginTmpl),
-	}
 	return &Renderer{
 		templates: templates,
 	}
 }
 
-func composeTemplate(layout *template.Template, content *template.Template) *template.Template {
-	tmpl := template.Must(layout.Clone())
+func composeTemplate(content *template.Template) *template.Template {
+	tmpl := template.Must(layoutTmpl.Clone())
 	titleBody := content.Lookup("title")
 	tmpl = template.Must(tmpl.AddParseTree("title", titleBody.Tree))
 	contentBody := content.Lookup("content")
@@ -46,6 +44,18 @@ func composeTemplate(layout *template.Template, content *template.Template) *tem
 // Render レンダリングを行います
 func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	return t.templates.ExecuteTemplate(w, name, data)
+}
+
+const (
+	// TmplLogin ログイン
+	TmplLogin string = "login"
+	// TmplLogout ログアウト
+	TmplLogout string = "logout"
+)
+
+var templates = TemplateMap{
+	TmplLogin:  composeTemplate(loginTmpl),
+	TmplLogout: composeTemplate(logoutTmpl),
 }
 
 var layoutTmpl = template.Must(template.New("layout").Parse(`<!doctype html>
@@ -66,7 +76,7 @@ type LoginView struct {
 	Errors ValidationResult
 }
 
-var loginTmpl = template.Must(template.New("login").Parse(`
+var loginTmpl = template.Must(template.New("").Parse(`
 {{define "title"}}Login{{end}}
 {{define "content"}}
 {{range .Errors}}
@@ -74,9 +84,16 @@ var loginTmpl = template.Must(template.New("login").Parse(`
 {{range .}}{{.}}{{end}}</div>
 {{end}}
 <form method="POST" action="login">
-<input type="text" name="user" placeholder="user name">
+<input type="text" name="login" placeholder="login_name">
 <input type="text" name="password" placeholder="passowrd">
 <button type="submit">Login</button>
 </form>
+{{end}}
+`))
+
+var logoutTmpl = template.Must(template.New("").Parse(`
+{{define "title"}}Logout{{end}}
+{{define "content"}}
+<p>ログアウトしました</p>
 {{end}}
 `))

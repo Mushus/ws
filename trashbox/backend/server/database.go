@@ -110,20 +110,20 @@ func (d *DB) AddUserIfNotExist(user User) error {
 }
 
 // VerifyUser ユーザー user を検証する
-func (d *DB) VerifyUser(login, password string) (bool, error) {
+func (d *DB) VerifyUser(login, password string) (User, bool, error) {
 	target, err := findUserByLogin(d.db, login)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, nil
+			return User{}, false, nil
 		}
-		return false, xerrors.Errorf("cannot verify user: %v", err)
+		return User{}, false, xerrors.Errorf("cannot verify user: %v", err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(target.Password), []byte(password)); err == nil {
-		return true, nil
+		return target, true, nil
 	}
 
-	return false, nil
+	return User{}, false, nil
 }
 
 // User ユーザー情報
