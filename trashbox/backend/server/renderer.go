@@ -46,16 +46,23 @@ func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
+func newTemplate(tmpl string) *template.Template {
+	return template.Must(template.New("").Parse(tmpl))
+}
+
 const (
 	// TmplLogin ログイン
 	TmplLogin string = "login"
 	// TmplLogout ログアウト
 	TmplLogout string = "logout"
+	// TmplEdit is edit form template
+	TmplEdit string = "edit"
 )
 
 var templates = TemplateMap{
 	TmplLogin:  composeTemplate(loginTmpl),
 	TmplLogout: composeTemplate(logoutTmpl),
+	TmplEdit:   composeTemplate(editTmpl),
 }
 
 var layoutTmpl = template.Must(template.New("layout").Parse(`<!doctype html>
@@ -76,7 +83,7 @@ type LoginView struct {
 	Errors ValidationResult
 }
 
-var loginTmpl = template.Must(template.New("").Parse(`
+var loginTmpl = newTemplate(`
 {{define "title"}}Login{{end}}
 {{define "content"}}
 {{range .Errors}}
@@ -89,11 +96,35 @@ var loginTmpl = template.Must(template.New("").Parse(`
 <button type="submit">Login</button>
 </form>
 {{end}}
-`))
+`)
 
-var logoutTmpl = template.Must(template.New("").Parse(`
+var logoutTmpl = newTemplate(`
 {{define "title"}}Logout{{end}}
 {{define "content"}}
 <p>ログアウトしました</p>
 {{end}}
-`))
+`)
+
+var editTmpl = newTemplate(`
+{{define "title"}}Edit{{end}}
+{{define "content"}}
+<textarea id="text">
+</textarea>
+<button type="button" id="savebutton">Save</button>
+<script>
+const button = document.getElementById('savebutton');
+const text = document.getElementById('text');
+button.addEventListener('click', async () => {
+	const init = {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ body: text.value })
+	};
+	const resp = await fetch('', init);
+});
+</script>
+{{end}}
+`)

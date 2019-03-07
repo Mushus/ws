@@ -46,7 +46,7 @@ func (s Server) Start() {
 	}
 }
 
-func createRouter(handler Handler) (*echo.Echo, error) {
+func createRouter(h Handler) (*echo.Echo, error) {
 	e := echo.New()
 
 	// settings
@@ -65,11 +65,11 @@ func createRouter(handler Handler) (*echo.Echo, error) {
 	e.Use(session, logger, recover)
 
 	// set up routings
-	e.GET("/login", handler.GetLogin)
-	e.POST("/login", handler.PostLogin)
-	e.GET("/logout", handler.GetLogout)
-	e.GET("/", handler.GetIndex)
-	e.GET("/:name", handler.GetDoc)
+	e.GET("/login", handlize(h.GetLogin))
+	e.POST("/login", handlize(h.PostLogin))
+	e.GET("/logout", handlize(h.GetLogout))
+	e.GET("/", handlize(h.GetIndex))
+	e.GET("/:name", handlize(h.GetDoc))
 
 	return e, nil
 }

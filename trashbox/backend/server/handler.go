@@ -2,10 +2,6 @@ package server
 
 import (
 	"net/http"
-
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
-	"github.com/labstack/echo/v4"
 )
 
 // Handler handler
@@ -23,7 +19,7 @@ func NewHandler(db *DB, docs *DocRepo) Handler {
 }
 
 // GetLogin ログインページ
-func (h Handler) GetLogin(c echo.Context) error {
+func (h Handler) GetLogin(c Context) error {
 	return c.Render(http.StatusOK, TmplLogin, LoginView{
 		Errors: ValidationResult{},
 	})
@@ -36,7 +32,7 @@ type LoginParam struct {
 }
 
 // PostLogin ログイン処理
-func (h Handler) PostLogin(c echo.Context) error {
+func (h Handler) PostLogin(c Context) error {
 	var prm LoginParam
 	if err := c.Bind(&prm); err != nil {
 		return c.String(http.StatusBadRequest, "Bad Request")
@@ -54,18 +50,12 @@ func (h Handler) PostLogin(c echo.Context) error {
 
 	// success login
 	if ok {
-		sess, err := session.Get("session", c)
-		if err != nil {
+		sess, _ := getSession(c)
+		sess.Values[SessionKeyUserID] = user.ID
+		if err := saveSession(c, sess); err != nil {
 			return err
 		}
-		sess.Options = &sessions.Options{
-			Path:     "/",
-			MaxAge:   SessionMaxAge,
-			HttpOnly: true,
-		}
-		sess.Values[SessionKeyUserID] = user.ID
-		sess.Save(c.Request(), c.Response())
-		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return c.Redirect(http.StatusSeeOther, "/")
 	}
 
 	return c.Render(http.StatusOK, TmplLogin, LoginView{
@@ -74,23 +64,26 @@ func (h Handler) PostLogin(c echo.Context) error {
 }
 
 // GetLogout is a handler to logout users
-func (h Handler) GetLogout(c echo.Context) error {
+func (h Handler) GetLogout(c Context) error {
 	// TODO: logout process
 	return c.Render(http.StatusOK, TmplLogout, nil)
 }
 
 // GetIndex is a handler show index of webpage
-func (h Handler) GetIndex(c echo.Context) error {
+func (h Handler) GetIndex(c Context) error {
 	return c.String(http.StatusOK, "it's works!")
 }
 
 // GetDoc is a handler of get document
-func (h Handler) GetDoc(c echo.Context) error {
+func (h Handler) GetDoc(c Context) error {
 	name := c.Param("name")
 
 	doc, err := h.docs.Get(name)
 	if err == DocumentNotFound {
-		return c.String(http.StatusNotFound, "404 document not found")
+		if !c.IsLoggedIn {
+			return c.String(http.StatusNotFound, "document not found")
+		}
+		return c.Render(http.StatusOK, TmplEdit, nil)
 	}
 	if err != nil {
 		return err
