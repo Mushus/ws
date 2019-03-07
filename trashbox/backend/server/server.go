@@ -69,7 +69,8 @@ func createRouter(h Handler) (*echo.Echo, error) {
 	e.POST("/login", handlize(h.PostLogin))
 	e.GET("/logout", handlize(h.GetLogout))
 	e.GET("/", handlize(h.GetIndex))
-	e.GET("/:name", handlize(h.GetDoc))
+	e.GET("/:title", handlize(h.GetDoc))
+	e.PUT("/:title", handlize(auth(h.PutDoc)))
 
 	return e, nil
 }

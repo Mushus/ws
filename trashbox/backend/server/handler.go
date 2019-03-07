@@ -27,8 +27,8 @@ func (h Handler) GetLogin(c Context) error {
 
 // LoginParam ログイン
 type LoginParam struct {
-	Login    string `validate:"required"`
-	Password string `validate:"required"`
+	Login    string `form:"login" validate:"required"`
+	Password string `form:"password" validate:"required"`
 }
 
 // PostLogin ログイン処理
@@ -76,17 +76,46 @@ func (h Handler) GetIndex(c Context) error {
 
 // GetDoc is a handler of get document
 func (h Handler) GetDoc(c Context) error {
-	name := c.Param("name")
+	title := c.Param("title")
 
-	doc, err := h.docs.Get(name)
+	doc, err := h.docs.Get(title)
 	if err == DocumentNotFound {
 		if !c.IsLoggedIn {
 			return c.String(http.StatusNotFound, "document not found")
 		}
-		return c.Render(http.StatusOK, TmplEdit, nil)
+		return c.Render(http.StatusOK, TmplEdit, EditView{
+			Title: title,
+		})
 	}
 	if err != nil {
 		return err
 	}
-	return c.String(http.StatusOK, doc.Body)
+	return c.String(http.StatusOK, doc.Content)
+}
+
+type PutDocParam struct {
+	Content string `json:"content" validate:"required"`
+}
+
+func (h Handler) PutDoc(c Context) error {
+	title := c.Param("title")
+
+	prm := PutDocParam{}
+	if err := c.Bind(&prm); err != nil {
+		return c.String(http.StatusBadRequest, "Bad Request")
+	}
+
+	if err := c.Validate(prm); err != nil {
+		return c.String(http.StatusBadRequest, "Bad Request")
+	}
+
+	doc := RawDocument{
+		Title:   title,
+		Content: prm.Content,
+	}
+
+	if err := h.docs.Put(doc); err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, struct{}{})
 }

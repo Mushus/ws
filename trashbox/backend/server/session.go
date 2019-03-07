@@ -29,7 +29,7 @@ func NewSession() (echo.MiddlewareFunc, error) {
 	return session.Middleware(store), nil
 }
 
-// SessionModel is a session
+// SessionModel represent a session instance
 type SessionModel struct {
 	UserID string
 }

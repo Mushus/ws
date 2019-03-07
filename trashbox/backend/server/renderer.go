@@ -105,23 +105,28 @@ var logoutTmpl = newTemplate(`
 {{end}}
 `)
 
+type EditView struct {
+	Title   string
+	Content string
+}
+
 var editTmpl = newTemplate(`
 {{define "title"}}Edit{{end}}
 {{define "content"}}
-<textarea id="text">
-</textarea>
+<input type="text" value="{{.Title}}">
+<textarea id="text">{{.Content}}</textarea>
 <button type="button" id="savebutton">Save</button>
 <script>
 const button = document.getElementById('savebutton');
 const text = document.getElementById('text');
 button.addEventListener('click', async () => {
 	const init = {
-		method: 'POST',
+		method: 'PUT',
 		headers: {
 			'Accept': 'application/json',
 			'Content-Type': 'application/json'
 		},
-		body: JSON.stringify({ body: text.value })
+		body: JSON.stringify({ content: text.value })
 	};
 	const resp = await fetch('', init);
 });
