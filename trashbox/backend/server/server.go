@@ -20,9 +20,10 @@ func New() (*Server, error) {
 		return nil, err
 	}
 
-	docs := NewDocRepo()
+	document := NewFileDocumentRepository()
+	asset := NewFileAssetRepository()
 
-	handler := NewHandler(db, docs)
+	handler := NewHandler(db, document, asset)
 
 	r, err := createRouter(handler)
 	if err != nil {
@@ -69,8 +70,10 @@ func createRouter(h Handler) (*echo.Echo, error) {
 	e.POST("/login", handlize(h.PostLogin))
 	e.GET("/logout", handlize(h.GetLogout))
 	e.GET("/", handlize(h.GetIndex))
-	e.GET("/:title", handlize(h.GetDoc))
-	e.PUT("/:title", handlize(auth(h.PutDoc)))
+	e.GET("/:title", handlize(h.GetDocument))
+	e.PUT("/:title", handlize(auth(h.PutDocument)))
+	e.GET("/assets/:id", handlize(h.GetAsset))
+	e.POST("/assets", handlize(auth(h.UploadAsset)))
 
 	return e, nil
 }

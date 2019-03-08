@@ -1,20 +1,23 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 )
 
 // Handler handler
 type Handler struct {
-	db   *DB
-	docs *DocRepo
+	db       *DB
+	document DocumentRepository
+	asset    AssetRepository
 }
 
 // NewHandler ハンドラを生成する
-func NewHandler(db *DB, docs *DocRepo) Handler {
+func NewHandler(db *DB, document DocumentRepository, asset AssetRepository) Handler {
 	return Handler{
-		db:   db,
-		docs: docs,
+		db:       db,
+		document: document,
+		asset:    asset,
 	}
 }
 
@@ -74,11 +77,11 @@ func (h Handler) GetIndex(c Context) error {
 	return c.String(http.StatusOK, "it's works!")
 }
 
-// GetDoc is a handler of get document
-func (h Handler) GetDoc(c Context) error {
+// GetDocument is a handler of get document
+func (h Handler) GetDocument(c Context) error {
 	title := c.Param("title")
 
-	doc, err := h.docs.Get(title)
+	doc, err := h.document.Get(title)
 	if err == DocumentNotFound {
 		if !c.IsLoggedIn {
 			return c.String(http.StatusNotFound, "document not found")
@@ -93,14 +96,16 @@ func (h Handler) GetDoc(c Context) error {
 	return c.String(http.StatusOK, doc.Content)
 }
 
-type PutDocParam struct {
+// PutDocumentParam is a parameter used as PutDocument handler
+type PutDocumentParam struct {
 	Content string `json:"content" validate:"required"`
 }
 
-func (h Handler) PutDoc(c Context) error {
+// PutDocument is a handler to save document
+func (h Handler) PutDocument(c Context) error {
 	title := c.Param("title")
 
-	prm := PutDocParam{}
+	prm := PutDocumentParam{}
 	if err := c.Bind(&prm); err != nil {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
@@ -109,18 +114,56 @@ func (h Handler) PutDoc(c Context) error {
 		return c.String(http.StatusBadRequest, "Bad Request")
 	}
 
-	doc := RawDocument{
+	doc := Document{
 		Title:   title,
 		Content: prm.Content,
 	}
 
-	if err := h.docs.Put(doc); err != nil {
+	if err := h.document.Put(doc); err != nil {
 		return err
 	}
 	return c.JSON(http.StatusOK, struct{}{})
 }
 
+func (h Handler) UploadAsset(c Context) error {
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		return err
+	}
+
+	fileName := fileHeader.Filename
+	contentType := fileHeader.Header.Get("Content-Type")
+	fmt.Println("$#v", fileHeader)
+	file, err := fileHeader.Open()
+	if err != nil {
+		return err
+	}
+	sa := StreamAsset{
+		Stream:      file,
+		FileName:    fileName,
+		ContentType: contentType,
+	}
+	id, err := h.asset.Add(sa)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	return c.String(http.StatusOK, id)
+}
+
 func (h Handler) GetAsset(c Context) error {
 	id := c.Param("id")
-	return nil
+
+	asset, err := h.asset.GetInStream(id)
+	if err == AssetNotFound {
+		return c.String(http.StatusNotFound, "asset not found")
+	}
+	if err != nil {
+		return err
+	}
+	defer asset.Close()
+
+	return c.Stream(http.StatusOK, asset.ContentType, asset)
 }

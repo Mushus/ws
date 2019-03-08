@@ -116,6 +116,10 @@ var editTmpl = newTemplate(`
 <input type="text" value="{{.Title}}">
 <textarea id="text">{{.Content}}</textarea>
 <button type="button" id="savebutton">Save</button>
+<form action="/assets" method="POST" enctype="multipart/form-data">
+<input type="file" name="file">
+<button type="submit">upload</button>
+</form>
 <script>
 const button = document.getElementById('savebutton');
 const text = document.getElementById('text');
