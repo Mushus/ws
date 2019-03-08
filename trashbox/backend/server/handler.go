@@ -119,3 +119,8 @@ func (h Handler) PutDoc(c Context) error {
 	}
 	return c.JSON(http.StatusOK, struct{}{})
 }
+
+func (h Handler) GetAsset(c Context) error {
+	id := c.Param("id")
+	return nil
+}
