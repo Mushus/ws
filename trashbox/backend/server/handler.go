@@ -3,6 +3,9 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"net/url"
+
+	"github.com/labstack/echo/v4"
 )
 
 // Handler handler
@@ -125,6 +128,54 @@ func (h Handler) PutDocument(c Context) error {
 	return c.JSON(http.StatusOK, struct{}{})
 }
 
+// GetAsset is a handler
+func (h Handler) GetAsset(c Context) error {
+	id := c.Param("id")
+
+	asset, err := h.asset.Get(id)
+	if err == AssetNotFound {
+		return c.String(http.StatusNotFound, "asset not found")
+	}
+	if err != nil {
+		return err
+	}
+	defer asset.Close()
+
+	h.decolateAssetResponse(c, asset)
+	return c.Stream(http.StatusOK, asset.ContentType, asset)
+}
+
+// GetFormatedAsset is a handler
+func (h Handler) GetFormatedAsset(c Context) error {
+	id := c.Param("id")
+	// format := c.Param("format")
+
+	asset, err := h.asset.Get(id)
+	if err == AssetNotFound {
+		return c.String(http.StatusNotFound, "asset not found")
+	}
+	if err != nil {
+		return err
+	}
+	defer asset.Close()
+
+	h.decolateAssetResponse(c, asset)
+	return c.Stream(http.StatusOK, asset.ContentType, asset)
+}
+
+func (h Handler) decolateAssetResponse(c Context, asset Asset) error {
+	resp := c.Response()
+	header := resp.Header()
+	// for download
+	download := c.QueryParam("download")
+	if download == "true" || download == "yes" {
+		encodedFileName := url.QueryEscape(asset.FileName)
+		hValue := fmt.Sprintf(`attachment;filename*="UTF-8''%s"`, encodedFileName)
+		header.Set(echo.HeaderContentDisposition, hValue)
+	}
+	return nil
+}
+
 func (h Handler) UploadAsset(c Context) error {
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
@@ -133,12 +184,11 @@ func (h Handler) UploadAsset(c Context) error {
 
 	fileName := fileHeader.Filename
 	contentType := fileHeader.Header.Get("Content-Type")
-	fmt.Println("$#v", fileHeader)
 	file, err := fileHeader.Open()
 	if err != nil {
 		return err
 	}
-	sa := StreamAsset{
+	sa := Asset{
 		Stream:      file,
 		FileName:    fileName,
 		ContentType: contentType,
@@ -151,19 +201,4 @@ func (h Handler) UploadAsset(c Context) error {
 	defer file.Close()
 
 	return c.String(http.StatusOK, id)
-}
-
-func (h Handler) GetAsset(c Context) error {
-	id := c.Param("id")
-
-	asset, err := h.asset.GetInStream(id)
-	if err == AssetNotFound {
-		return c.String(http.StatusNotFound, "asset not found")
-	}
-	if err != nil {
-		return err
-	}
-	defer asset.Close()
-
-	return c.Stream(http.StatusOK, asset.ContentType, asset)
 }

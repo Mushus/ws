@@ -26,7 +26,7 @@ type FileDocumentRepository struct {
 	dir string
 }
 
-// NewDocRepo is creating new document repository
+// NewFileDocumentRepository is creating new document repository
 func NewFileDocumentRepository() *FileDocumentRepository {
 	return &FileDocumentRepository{
 		dir: "docs",

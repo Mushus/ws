@@ -7,30 +7,31 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/rs/xid"
 	"golang.org/x/xerrors"
 )
 
-// AssetNotFound is a error thrown when the asset does not exist
-var AssetNotFound = xerrors.New("document not found")
+var (
+	// AssetNotFound is an error that occurs when an asset does not exist.
+	AssetNotFound = xerrors.New("document not found")
+	// IDFormat reprecents the format of ID.
+	IDFormat = regexp.MustCompile("^[0-9a-v]{20}$")
+	// FormatFormat is
+	AssetFormatFormat = regexp.MustCompile("^[0-9a-zA-Z_\\-]+$")
+)
 
 const (
 	// InfoFileName is a file name of the asset information
 	InfoFileName = "info.json"
 	// OfirinalFileName is a file name of the raw asset
-	OfirinalFileName = "orig"
+	OfirinalFileName = "@orig"
 )
 
 type (
 	// Asset is a file uploaded by user
 	Asset struct {
-		ID          string `json:"id"`
-		ContentType string `json:"contentType"`
-	}
-
-	// StreamAsset is ...
-	StreamAsset struct {
 		ID          string        `json:"id"`
 		Stream      io.ReadCloser `json:"-"`
 		ContentType string        `json:"contentType"`
@@ -42,19 +43,19 @@ type (
 		FileName    string `json:"fileName"`
 		ContentType string `json:"contentType"`
 	}
+	// FileAssetRepository is a repository saving asset to file system
+	FileAssetRepository struct {
+		dir string
+	}
 )
 
-func (s StreamAsset) Read(p []byte) (n int, err error) {
-	return s.Stream.Read(p)
+func (a Asset) Read(p []byte) (n int, err error) {
+	return a.Stream.Read(p)
 }
 
-func (s StreamAsset) Close() error {
-	return s.Stream.Close()
-}
-
-// FileAssetRepository is a repository saving asset to file system
-type FileAssetRepository struct {
-	dir string
+// Close is
+func (a Asset) Close() error {
+	return a.Stream.Close()
 }
 
 // NewFileAssetRepository create new FileAssetRepository
@@ -64,42 +65,46 @@ func NewFileAssetRepository() *FileAssetRepository {
 	}
 }
 
+// GetFormatedInStream gets asset by id
 func (f FileAssetRepository) Get(id string) (Asset, error) {
-	return Asset{
-		ID: id,
-	}, nil
+	return f.getFormated(id, OfirinalFileName)
 }
 
-func (f FileAssetRepository) GetInStream(id string) (StreamAsset, error) {
+// GetFormatedInStream gets formated asset by id
+func (f FileAssetRepository) getFormated(id, format string) (Asset, error) {
+	if !f.ValidateID(id) || !f.ValidateFormat(format) {
+		return Asset{}, AssetNotFound
+	}
+
 	dir := f.getDirPath(id)
 	// read files
 	infoFilePath := filepath.Join(dir, InfoFileName)
-	originalFilePath := filepath.Join(dir, OfirinalFileName)
+	formatedFilePath := filepath.Join(dir, format)
 
 	// check file exists
-	if _, err := os.Stat(infoFilePath); err != nil {
-		return StreamAsset{}, AssetNotFound
+	if _, err := os.Stat(formatedFilePath); err != nil {
+		return Asset{}, AssetNotFound
 	}
 
 	// read info
 	infoFile, err := os.Open(infoFilePath)
 	if err != nil {
-		return StreamAsset{}, xerrors.Errorf("cannot open asset info: %w", err)
+		return Asset{}, xerrors.Errorf("cannot open asset info: %w", err)
 	}
 
 	var info AssetInfo
 	decoder := json.NewDecoder(infoFile)
 	if err := decoder.Decode(&info); err != nil {
-		return StreamAsset{}, xerrors.Errorf("cannt read asset info: %w", err)
+		return Asset{}, xerrors.Errorf("cannt read asset info: %w", err)
 	}
 
 	// read original
-	file, err := os.Open(originalFilePath)
+	file, err := os.Open(formatedFilePath)
 	if err != nil {
-		return StreamAsset{}, xerrors.Errorf("cannot open asset: %w", err)
+		return Asset{}, xerrors.Errorf("cannot open asset: %w", err)
 	}
 
-	return StreamAsset{
+	return Asset{
 		ID:          id,
 		Stream:      file,
 		FileName:    info.FileName,
@@ -107,7 +112,7 @@ func (f FileAssetRepository) GetInStream(id string) (StreamAsset, error) {
 	}, nil
 }
 
-func (f FileAssetRepository) Add(asset StreamAsset) (string, error) {
+func (f FileAssetRepository) Add(asset Asset) (string, error) {
 	id := xid.New().String()
 	dir := f.getDirPath(id)
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -124,6 +129,17 @@ func (f FileAssetRepository) Add(asset StreamAsset) (string, error) {
 	return id, nil
 }
 
+// ValidateID is used to Validate ID format.
+// This method returns true if id Format is valid.
+func (f FileAssetRepository) ValidateID(id string) bool {
+	return IDFormat.MatchString(id)
+}
+
+// ValidateFormat is used to Validate format format.
+func (f FileAssetRepository) ValidateFormat(format string) bool {
+	return AssetFormatFormat.MatchString(format)
+}
+
 func (f FileAssetRepository) getDirPath(id string) string {
 	// calc dirname
 	b := sha256.Sum256([]byte(id))
@@ -134,7 +150,7 @@ func (f FileAssetRepository) getDirPath(id string) string {
 	return filepath.Join(f.dir, dirName, id)
 }
 
-func (f FileAssetRepository) createInfo(dir string, asset StreamAsset) error {
+func (f FileAssetRepository) createInfo(dir string, asset Asset) error {
 	infoFilePath := filepath.Join(dir, InfoFileName)
 	// open asset info
 	file, err := os.OpenFile(infoFilePath, os.O_WRONLY|os.O_CREATE, 0644)
@@ -155,7 +171,7 @@ func (f FileAssetRepository) createInfo(dir string, asset StreamAsset) error {
 	return nil
 }
 
-func (f FileAssetRepository) createOriginal(dir string, asset StreamAsset) error {
+func (f FileAssetRepository) createOriginal(dir string, asset Asset) error {
 	origFilePath := filepath.Join(dir, OfirinalFileName)
 	// open original asset file
 	file, err := os.OpenFile(origFilePath, os.O_WRONLY|os.O_CREATE, 0666)
@@ -168,5 +184,9 @@ func (f FileAssetRepository) createOriginal(dir string, asset StreamAsset) error
 		return xerrors.Errorf("cannot write original asset: %w", err)
 	}
 
+	return nil
+}
+
+func (f FileAssetRepository) Remove(id string) error {
 	return nil
 }

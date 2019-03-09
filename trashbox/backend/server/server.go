@@ -73,6 +73,7 @@ func createRouter(h Handler) (*echo.Echo, error) {
 	e.GET("/:title", handlize(h.GetDocument))
 	e.PUT("/:title", handlize(auth(h.PutDocument)))
 	e.GET("/assets/:id", handlize(h.GetAsset))
+	e.GET("/assets/:id/:format", handlize(h.GetFormatedAsset))
 	e.POST("/assets", handlize(auth(h.UploadAsset)))
 
 	return e, nil

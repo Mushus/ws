@@ -7,6 +7,11 @@ type DocumentRepository interface {
 
 type AssetRepository interface {
 	Get(id string) (Asset, error)
-	GetInStream(id string) (StreamAsset, error)
-	Add(streamAsset StreamAsset) (string, error)
+	Add(streamAsset Asset) (string, error)
+	Remove(id string) error
+}
+type AssetCacheRepository interface {
+	GetCache(id, format string) (Asset, error)
+	PutCache(asset Asset, format string) error
+	PurgeAll(id string) error
 }
