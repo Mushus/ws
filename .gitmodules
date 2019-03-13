@@ -13,3 +13,6 @@
 [submodule "apart"]
 	path = apart
 	url = git@github.com:Mushus/apart.git
+[submodule "trashbox"]
+	path = trashbox
+	url = git@github.com:Mushus/trashbox.git
